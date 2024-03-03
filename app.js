@@ -4,12 +4,12 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 
 var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
-var rolesRouter = require("./routes/roles");
-var facultiesRouter = require("./routes/faculties");
-var magazinesRouter = require("./routes/magazines");
-var contributionsRouter = require("./routes/contributions");
-var commentsRouter = require("./routes/comments");
+var usersRouter = require("./routes/user");
+var rolesRouter = require("./routes/role");
+var facultiesRouter = require("./routes/faculty");
+var magazinesRouter = require("./routes/magazine");
+var contributionsRouter = require("./routes/contribution");
+var commentsRouter = require("./routes/comment");
 
 var mongoose = require("mongoose");
 var cors = require("cors");
