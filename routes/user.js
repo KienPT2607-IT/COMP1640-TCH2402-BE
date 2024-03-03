@@ -1,9 +1,22 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
+const UserModel = require("../models/UserModel");
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+/* GET users listing.
+ * path: .../users/
+ */
+router.get("/", async (req, res) => {
+	try {
+		let users = await UserModel.find();
+		res.status(200).json({
+			data: users,
+		});
+	} catch (error) {
+		console.log("Found an error:" + error);
+		res.status(401).json({
+			error: error,
+		});
+	}
 });
 
 
