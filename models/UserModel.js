@@ -19,6 +19,7 @@ var UserSchema = Schema({
 		minLength: [8, "Password must be at least 8 characters"],
 		maxLength: [16, "Password cannot exceed 16 characters"],
 		select: false,
+		default: "12345678",
 	},
 	dob: Date,
 	phone_number: {
