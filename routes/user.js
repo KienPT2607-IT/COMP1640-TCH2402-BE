@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 const UserModel = require("../models/UserModel");
-
+const { getCurrentDate } = require("../utilities/date")
 /* GET users listing.
  * path: .../users/
  */
@@ -53,7 +53,8 @@ router.post("/register", async (req, res) => {
 			created_by,
 			role,
 		} = req.body;
-		let mngCoordinator = await UserModel.findById(created_by);
+		const mngCoordinator = await UserModel.findById(created_by);
+
 		await UserModel.create({
 			full_name: full_name,
 			email: email,
@@ -61,14 +62,14 @@ router.post("/register", async (req, res) => {
 			phone_number: phone_number,
 			gender: gender,
 			profile_picture: profile_picture,
-			registration_date: Date.now,
+			registration_date: getCurrentDate(),
 			faculty: mngCoordinator.faculty,
 			created_by: created_by,
 			role: role,
 		});
 		res.status(201).json({
-			message: "Student added successfully!"
-		})
+			message: "Student added successfully!",
+		});
 	} catch (error) {
 		console.log("Found an error:" + error);
 		res.status(404).json({
