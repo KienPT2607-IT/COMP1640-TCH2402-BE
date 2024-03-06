@@ -57,10 +57,6 @@ var UserSchema = Schema({
 		type: SchemaTypes.ObjectId,
 		ref: "faculties",
 	},
-	created_by: {
-		type: SchemaTypes.ObjectId,
-		ref: "users",
-	},
 	role: {
 		type: SchemaTypes.ObjectId,
 		ref: "roles",

@@ -1,6 +1,6 @@
 const { Schema, SchemaTypes, model } = require("mongoose");
 
-var MagazineSchema = Schema({
+var EventSchema = Schema({
 	name: {
 		type: String,
 		required: true,
@@ -36,5 +36,5 @@ var MagazineSchema = Schema({
 	description: String,
 });
 
-var MagazineModel = model("magazines", MagazineSchema);
-module.exports = MagazineModel;
+var EventModel = model("events", EventSchema);
+module.exports = EventModel;

@@ -6,11 +6,6 @@ var FacultySchema = Schema({
 		unique: true,
 		required: true,
 	},
-	created_by: {
-		type: SchemaTypes.ObjectId,
-		ref: "users",
-		required: true,
-	},
 	status: {
 		type: Boolean,
 		required: true,
