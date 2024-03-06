@@ -10,6 +10,14 @@ var CommentSchema = Schema({
 		ref: "users",
 		required: true,
 	},
+	like_count: {
+		type: Number,
+		min: 0,
+	},
+	dislike_count: {
+		type: Number,
+		min: 0,
+	},
 	contribution: {
 		type: SchemaTypes.ObjectId,
 		ref: "contributions",
@@ -20,11 +28,11 @@ var CommentSchema = Schema({
 		required: true,
 		default: Date.now,
 	},
-    status: {
-        type: Boolean,
-        required: true,
-        default: true,
-    }
+	status: {
+		type: Boolean,
+		required: true,
+		default: true,
+	},
 });
 
 var CommentModel = model("comments", CommentSchema);

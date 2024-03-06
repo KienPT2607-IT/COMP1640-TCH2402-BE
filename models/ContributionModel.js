@@ -13,6 +13,14 @@ var ContributionSchema = Schema({
 		type: String,
 		unique: true,
 	},
+	like_count: {
+		type: Number,
+		min: 0
+	},
+	dislike_count: {
+		type: Number,
+		min: 0
+	},
 	submission_date: {
 		type: Date,
 		required: true,
@@ -23,9 +31,9 @@ var ContributionSchema = Schema({
 		required: true,
 		default: Date.now,
 	},
-	magazine: {
+	event: {
 		type: SchemaTypes.ObjectId,
-		ref: "magazines",
+		ref: "events",
 	},
 });
 
