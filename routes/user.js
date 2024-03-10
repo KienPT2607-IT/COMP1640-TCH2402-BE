@@ -1,10 +1,15 @@
 var express = require("express");
 var router = express.Router();
 const UserModel = require("../models/UserModel");
-const { getCurrentDate } = require("../utilities/date")
-/* GET users listing.
- * path: .../users/
- */
+const FacultyModel = require("../models/FacultyModel");
+const RoleModel = require("../models/RoleModel");
+const { getCurrentDate } = require("../utilities/date");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const { tokenSecret, saltRounds } = require("../utilities/constants");
+const { isAdmin } = require("../middlewares/auth");
+
+// * GET users listing.
 router.get("/", async (req, res) => {
 	try {
 		let users = await UserModel.find();
@@ -23,56 +28,83 @@ router.get("/", async (req, res) => {
 
 router.post("/login", async (req, res) => {
 	try {
-		const { password, email } = req.body;
-		console.log(email + " / " + password);
+		const { email, password } = req.body;
 		let user = await UserModel.findOne({
 			email: email,
-			password: password,
-		});
-		console.log(user);
+		})
+			.select("+password")
+			.populate("faculty")
+			.populate("role"); // "+" = allow select hidden field
+		if (!user) {
+			return res.status(400).json({
+				message: "User with this email does not exist!",
+			});
+		}
+
+		const isPassMatch = await bcrypt.compare(password, user.password);
+		if (!isPassMatch) {
+			return res.status(400).json({
+				message: "Incorrect password!",
+			});
+		}
+		const token = jwt.sign(
+			{ _id: user._id, role: user.role.name },
+			tokenSecret
+		);
 		res.status(200).json({
+			token: token,
 			data: user,
 		});
 	} catch (error) {
-		console.log("Found an error:" + error);
-		res.status(404).json({
+		console.log(error);
+		res.status(500).json({
 			error: error.message,
 		});
 	}
 });
 
-router.post("/register", async (req, res) => {
+router.post("/register", isAdmin, async (req, res) => {
 	try {
 		const {
 			full_name,
 			email,
+			password,
 			dob,
 			gender,
 			phone_number,
 			profile_picture,
-			created_by,
+			faculty,
 			role,
 		} = req.body;
-		const mngCoordinator = await UserModel.findById(created_by);
-
+		const _faculty = await FacultyModel.findOne({ name: faculty });
+		if (!_faculty)
+			return res.status(400).json({
+				message: "Faculty not found!",
+			});
+		const _role = await RoleModel.findOne({ name: role });
+		if (!_role)
+			return res.status(400).json({
+				message: "Role not found!",
+			});
+		const hashedPass = await bcrypt.hash(password, saltRounds);
 		await UserModel.create({
 			full_name: full_name,
 			email: email,
+			password: hashedPass,
 			dob: dob,
 			phone_number: phone_number,
 			gender: gender,
 			profile_picture: profile_picture,
 			registration_date: getCurrentDate(),
-			faculty: mngCoordinator.faculty,
-			created_by: created_by,
-			role: role,
+			faculty: _faculty._id,
+			role: _role._id,
 		});
 		res.status(201).json({
-			message: "Student added successfully!",
+			message: "Account added successfully!",
 		});
 	} catch (error) {
 		console.log("Found an error:" + error);
-		res.status(404).json({
+		res.status(500).json({
 			error: error.message,
 		});
 	}
