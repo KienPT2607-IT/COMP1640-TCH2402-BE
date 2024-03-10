@@ -5,7 +5,9 @@ const FacultyModel = require("../models/FacultyModel");
 const RoleModel = require("../models/RoleModel");
 const { getCurrentDate } = require("../utilities/date");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
+const { tokenSecret, saltRounds } = require("../utilities/constants");
+const { isAdmin } = require("../middlewares/auth");
 
 // * GET users listing.
 router.get("/", async (req, res) => {
@@ -29,7 +31,10 @@ router.post("/login", async (req, res) => {
 		const { email, password } = req.body;
 		let user = await UserModel.findOne({
 			email: email,
-		}).select("+password"); // "+" = allow select hidden field
+		})
+			.select("+password")
+			.populate("faculty")
+			.populate("role"); // "+" = allow select hidden field
 		if (!user) {
 			return res.status(400).json({
 				message: "User with this email does not exist!",
@@ -42,22 +47,23 @@ router.post("/login", async (req, res) => {
 				message: "Incorrect password!",
 			});
 		}
-
-		const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET); // TOKEN_SECRET is a secret key stored in .env file
-
-		
+		const token = jwt.sign(
+			{ _id: user._id, role: user.role.name },
+			tokenSecret
+		);
 		res.status(200).json({
 			token: token,
 			data: user,
 		});
 	} catch (error) {
+		console.log(error);
 		res.status(500).json({
 			error: error.message,
 		});
 	}
 });
 
-router.post("/register", async (req, res) => {
+router.post("/register", isAdmin, async (req, res) => {
 	try {
 		const {
 			full_name,
@@ -70,21 +76,21 @@ router.post("/register", async (req, res) => {
 			faculty,
 			role,
 		} = req.body;
-		const _faculty = await FacultyModel.findById(faculty);
+		const _faculty = await FacultyModel.findOne({ name: faculty });
 		if (!_faculty)
 			return res.status(400).json({
 				message: "Faculty not found!",
 			});
-
 		const _role = await RoleModel.findOne({ name: role });
 		if (!_role)
 			return res.status(400).json({
 				message: "Role not found!",
 			});
-
+		const hashedPass = await bcrypt.hash(password, saltRounds);
 		await UserModel.create({
 			full_name: full_name,
 			email: email,
+			password: hashedPass,
 			dob: dob,
 			phone_number: phone_number,
 			gender: gender,
@@ -94,11 +100,11 @@ router.post("/register", async (req, res) => {
 			role: _role._id,
 		});
 		res.status(201).json({
-			message: "Student added successfully!",
+			message: "Account added successfully!",
 		});
 	} catch (error) {
 		console.log("Found an error:" + error);
-		res.status(404).json({
+		res.status(500).json({
 			error: error.message,
 		});
 	}

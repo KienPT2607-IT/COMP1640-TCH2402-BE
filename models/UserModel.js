@@ -16,10 +16,7 @@ var UserSchema = Schema({
 	password: {
 		type: String,
 		required: true,
-		minLength: [8, "Password must be at least 8 characters"],
-		maxLength: [16, "Password cannot exceed 16 characters"],
 		select: false,
-		default: "12345678",
 	},
 	dob: Date,
 	phone_number: {
@@ -42,7 +39,6 @@ var UserSchema = Schema({
 			message: "Invalid image file path",
 		},
 	},
-	last_login: Date,
 	registration_date: {
 		type: Date,
 		required: true,
