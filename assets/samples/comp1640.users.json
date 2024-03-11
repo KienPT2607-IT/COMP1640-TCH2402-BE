@@ -1,0 +1,141 @@
+[{
+  "_id": {
+    "$oid": "65ede1ae98513c6edaa775b3"
+  },
+  "full_name": "Sophi Brown",
+  "email": "sophi.brown@gmail.com",
+  "password": "$2a$08$sCM602qvLNnz2dTVwchSMex/y1aR2ItXIQmdyRaITr4BMo5aV5OMO",
+  "dob": {
+    "$date": "1992-09-30T00:00:00.000Z"
+  },
+  "phone_number": "0876543210",
+  "gender": false,
+  "profile_picture": "sophi_brown.jpg",
+  "registration_date": {
+    "$date": "2024-03-10T16:37:02.000Z"
+  },
+  "account_status": true,
+  "faculty": {
+    "$oid": "65e4543fa0382d744f8d4a72"
+  },
+  "role": {
+    "$oid": "65e45058a0382d744f8d4a67"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65edecc598513c6edaa775b7"
+  },
+  "full_name": "Sophi",
+  "email": "sophi@gmail.com",
+  "password": "$2a$08$Pw4BhS2YK9WMCOrJuWDyJOtDazMNAIoNQyP7r/tG55FgMPM57j4nm",
+  "dob": {
+    "$date": "1992-09-30T00:00:00.000Z"
+  },
+  "phone_number": "0876543210",
+  "gender": false,
+  "profile_picture": "sophi.jpg",
+  "registration_date": {
+    "$date": "2024-03-10T17:24:21.000Z"
+  },
+  "account_status": true,
+  "faculty": {
+    "$oid": "65e4543fa0382d744f8d4a72"
+  },
+  "role": {
+    "$oid": "65e45058a0382d744f8d4a65"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65edecef98513c6edaa775bb"
+  },
+  "full_name": "Sophi",
+  "email": "sophi1@gmail.com",
+  "password": "$2a$08$vDudsVcXBMfRZ3BiFVT5ruwENr1ziLRHhYPTiRaDXFwDOdyRH376y",
+  "dob": {
+    "$date": "1992-09-30T00:00:00.000Z"
+  },
+  "phone_number": "0876543210",
+  "gender": false,
+  "profile_picture": "sophi.jpg",
+  "registration_date": {
+    "$date": "2024-03-10T17:25:03.000Z"
+  },
+  "account_status": true,
+  "faculty": {
+    "$oid": "65e4543fa0382d744f8d4a72"
+  },
+  "role": {
+    "$oid": "65e45058a0382d744f8d4a64"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65edf5c19996de72e96a4941"
+  },
+  "full_name": "Admin",
+  "email": "admin@gmail.com",
+  "password": "$2a$08$/odVET3B4kWfh3hINdnMDetdpzyaJLwV81/EgU4LCaUG058jMG6IC",
+  "registration_date": {
+    "$date": "2024-03-10T18:02:41.000Z"
+  },
+  "account_status": true,
+  "role": {
+    "$oid": "65e45058a0382d744f8d4a66"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65edf889c2ea60f71aea9878"
+  },
+  "full_name": "Sophi Brown",
+  "email": "sophiii.brown@gmail.com",
+  "password": "$2a$08$fh/6FmiBkRdrsHb3lF9fGecFR4ncMx/NcuEi7R6EQCnxdv4f13kji",
+  "dob": {
+    "$date": "1992-09-30T00:00:00.000Z"
+  },
+  "phone_number": "0876543210",
+  "gender": false,
+  "profile_picture": "sophi_brown.jpg",
+  "registration_date": {
+    "$date": "2024-03-10T18:14:33.000Z"
+  },
+  "account_status": true,
+  "faculty": {
+    "$oid": "65e4543fa0382d744f8d4a72"
+  },
+  "role": {
+    "$oid": "65e45058a0382d744f8d4a67"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65eea03e680a8bc6ea5a1fb9"
+  },
+  "full_name": "Sophi Brown",
+  "email": "sophi21.brown@gmail.com",
+  "password": "$2a$08$x.uu4mCCIuZYLVEhpZnNCOMYT4ELrRvr3UTzQR8HbT71al7PN2D.S",
+  "dob": {
+    "$date": "1992-09-30T00:00:00.000Z"
+  },
+  "phone_number": "0876543210",
+  "gender": false,
+  "profile_picture": "sophi_brown.jpg",
+  "registration_date": {
+    "$date": "2024-03-11T06:10:06.000Z"
+  },
+  "account_status": true,
+  "faculty": {
+    "$oid": "65e4543fa0382d744f8d4a72"
+  },
+  "role": {
+    "$oid": "65e45058a0382d744f8d4a67"
+  },
+  "__v": 0
+}]

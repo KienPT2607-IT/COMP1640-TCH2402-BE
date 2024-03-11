@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
@@ -16,6 +18,7 @@ var cors = require("cors");
 
 // const db = "mongodb://localhost:27017/comp1640"; // database url connection
 const db = process.env.DB_CONNECTION_STRING; // database url connection
+console.log(typeof db);
 var app = express();
 
 mongoose

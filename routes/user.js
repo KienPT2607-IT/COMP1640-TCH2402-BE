@@ -64,7 +64,7 @@ router.post("/login", async (req, res) => {
 	}
 });
 
-router.post("/register", isAdmin, async (req, res) => {
+router.post("/create-user", isAdmin, async (req, res) => {
 	try {
 		const {
 			full_name,

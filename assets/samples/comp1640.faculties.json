@@ -1,0 +1,39 @@
+[{
+  "_id": {
+    "$oid": "65e4543fa0382d744f8d4a72"
+  },
+  "name": "IT",
+  "created_by": {
+    "$oid": "65e4510ca0382d744f8d4a6b"
+  },
+  "created_date": {
+    "$date": "2024-03-03T12:30:00.000Z"
+  },
+  "status": true
+},
+{
+  "_id": {
+    "$oid": "65e4543fa0382d744f8d4a73"
+  },
+  "name": "Graphic and Digital Design",
+  "created_by": {
+    "$oid": "65e4510ca0382d744f8d4a6b"
+  },
+  "created_date": {
+    "$date": "2024-03-03T12:30:00.000Z"
+  },
+  "status": true
+},
+{
+  "_id": {
+    "$oid": "65e4543fa0382d744f8d4a74"
+  },
+  "name": "Business Management",
+  "created_by": {
+    "$oid": "65e4510ca0382d744f8d4a6b"
+  },
+  "created_date": {
+    "$date": "2024-03-03T12:30:00.000Z"
+  },
+  "status": true
+}]
