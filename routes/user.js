@@ -8,7 +8,7 @@ const RoleModel = require("../models/RoleModel");
 const { getCurrentDate } = require("../utilities/date");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { isAdmin } = require("../middlewares/auth");
+const { isAuth } = require("../middlewares/auth");
 const tokenSecret = process.env.TOKEN_SECRET_KEY;
 const saltRounds = process.env.SALT_ROUNDS;
 
@@ -66,7 +66,7 @@ router.post("/login", async (req, res) => {
 	}
 });
 
-router.post("/create-user", isAdmin, async (req, res) => {
+router.post("/create-user", isAuth(["Admin"]), async (req, res) => {
 	try {
 		const {
 			full_name,
