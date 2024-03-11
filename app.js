@@ -9,16 +9,15 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/user");
 var rolesRouter = require("./routes/role");
 var facultiesRouter = require("./routes/faculty");
-var magazinesRouter = require("./routes/magazine");
+var eventsRouter = require("./routes/event");
 var contributionsRouter = require("./routes/contribution");
 var commentsRouter = require("./routes/comment");
 
 var mongoose = require("mongoose");
 var cors = require("cors");
 
-// const db = "mongodb://localhost:27017/comp1640"; // database url connection
+// const db = "mongodb://localhost:27017/comp1640"; // local database url connection
 const db = process.env.DB_CONNECTION_STRING; // database url connection
-console.log(typeof db);
 var app = express();
 
 mongoose
@@ -37,7 +36,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/roles", rolesRouter);
 app.use("/faculties", facultiesRouter);
-app.use("/magazines", magazinesRouter);
+app.use("/events", eventsRouter);
 app.use("contributions", contributionsRouter);
 app.use("/comments", commentsRouter);
 
