@@ -14,8 +14,8 @@ var commentsRouter = require("./routes/comment");
 var mongoose = require("mongoose");
 var cors = require("cors");
 
-const db = "mongodb://localhost:27017/comp1640"; // database url connection
-
+// const db = "mongodb://localhost:27017/comp1640"; // database url connection
+const db = process.env.DB_CONNECTION_STRING; // database url connection
 var app = express();
 
 mongoose

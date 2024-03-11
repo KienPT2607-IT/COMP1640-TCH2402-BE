@@ -6,8 +6,9 @@ const RoleModel = require("../models/RoleModel");
 const { getCurrentDate } = require("../utilities/date");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { tokenSecret, saltRounds } = require("../utilities/constants");
 const { isAdmin } = require("../middlewares/auth");
+const tokenSecret = process.env.TOKEN_SECRET_KEY;
+const saltRounds = process.env.SALT_ROUNDS;
 
 // * GET users listing.
 router.get("/", async (req, res) => {
