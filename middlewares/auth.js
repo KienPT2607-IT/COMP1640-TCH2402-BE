@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { tokenSecret } = require("../utilities/constants");
+const tokenSecret = process.env.TOKEN_SECRET_KEY;
 
 const isAdmin = (req, res, next) => {
 	try {
