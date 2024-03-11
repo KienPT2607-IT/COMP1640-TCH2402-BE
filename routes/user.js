@@ -109,4 +109,77 @@ router.post("/register", isAdmin, async (req, res) => {
 		});
 	}
 });
+
+router.get(
+	'/:id',
+	async (req, res) => {
+	  const user = await UserModel.findById(req.params.id);
+	  if (user) {
+		res.send(user);
+	  } else {
+		res.status(404).send({ message: 'User Not Found' });
+	  }
+	}
+  );
+
+  router.put("/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { password, phone_number, profile_picture } = req.body;
+
+        // Kiểm tra xem người dùng có tồn tại trong cơ sở dữ liệu không
+        const user = await UserModel.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Nếu có trường password được cung cấp, mã hóa mật khẩu mới và cập nhật vào user
+        if (password) {
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            user.password = hashedPassword;
+        }
+
+        // Cập nhật phone number nếu được cung cấp
+        if (phone_number) {
+            user.phone_number = phone_number;
+        }
+
+        // Cập nhật profile picture nếu được cung cấp
+        if (profile_picture) {
+            user.profile_picture = profile_picture;
+        }
+
+        // Lưu thông tin người dùng đã cập nhật vào cơ sở dữ liệu
+        const updatedUser = await user.save();
+
+        // Trả về phản hồi thành công với thông tin người dùng đã cập nhật
+        res.status(200).json({ message: "User updated successfully", data: updatedUser });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+
+
+
+//  //update student
+//  router.put(
+// 	'/:id',
+// 	async (req, res) => {
+// 	  const user = await UserModel.findById(req.params.id);
+// 	  if (user) {
+// 		user.full_name = req.body.full_name || user.full_name;
+// 		user.email = req.body.email || user.email;
+// 		user.phone_number = req.body.phone_number || user.phone_number;
+// 		user.profile_picture = req.body.profile_picture || user.profile_picture;
+// 		const updatedUser = await user.save();
+// 		res.send({ message: 'User Updated', user: updatedUser });
+// 	  } else {
+// 		res.status(404).send({ message: 'User Not Found' });
+// 	  }
+// 	}
+//   );
+
+
+  
 module.exports = router;
