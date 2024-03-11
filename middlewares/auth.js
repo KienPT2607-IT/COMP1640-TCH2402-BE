@@ -31,5 +31,5 @@ const isAuth = (allowedRoles) => (req, res, next) => {
 };
 
 module.exports = {
-	isAdmin,
+	isAuth,
 };
