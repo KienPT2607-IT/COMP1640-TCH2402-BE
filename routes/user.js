@@ -112,6 +112,7 @@ router.post("/register", isAdmin, async (req, res) => {
 	}
 });
 
+// --------------------------Update Student info-------------------------
 router.get(
 	'/:id',
 	async (req, res) => {
@@ -165,6 +166,7 @@ router.get(
     }
 });
 
+//----------------------------Forgot-password------------------------------
 
   // Phần cấu hình transporter
 const transporter = nodemailer.createTransport({
@@ -223,5 +225,20 @@ async function sendResetEmail(email, resetToken) {
         console.error('Error sending email:', error);
     }
 }
+
+//--------------------------Delete account-------------------------
+router.delete("/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    // Delete the user from the database
+    await UserModel.findByIdAndDelete(userId);
+
+    res.status(200).json({ message: "Account deleted successfully" });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
 
 module.exports = router;
