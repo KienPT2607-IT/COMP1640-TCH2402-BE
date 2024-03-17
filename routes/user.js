@@ -118,7 +118,7 @@ router.post("/create-user", isAuth(["Admin"]), async (req, res) => {
 
 // --------------------------Update Student info-------------------------
 router.get(
-	'/:id',
+	'/update/:id',
 	async (req, res) => {
 	  const user = await UserModel.findById(req.params.id);
 	  if (user) {
@@ -129,7 +129,7 @@ router.get(
 	}
   );
 
-  router.put("/:id", async (req, res) => {
+  router.put("/update/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const {email, password, phone_number, profile_picture } = req.body;
