@@ -89,7 +89,7 @@ router.put("edit/:id", async (req, res) => {
 });
 
 // Delete a Event by its ID
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:id", async (req, res) => {
     try {
         const event = await EventModel.findById(req.params.id);
         if (!event) return res.status(404).send("Event not found");

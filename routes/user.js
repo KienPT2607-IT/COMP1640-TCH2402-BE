@@ -170,7 +170,7 @@ router.get(
 
   // Phần cấu hình transporter
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com', // Địa chỉ SMTP server của bạn
+    host: 'smtp.gmail.com', // Địa chỉ SMTP server 
     port: 587, // Cổng SMTP
     secure: false, // Nếu sử dụng SSL/TLS, đặt giá trị là true
     auth: {
@@ -190,19 +190,18 @@ router.post("/forgot-password", async (req, res) => {
     }
 
     // Generate a random password reset token
-    const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const newPassword = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
-    // Save the reset token and its expiration date to the user document
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
+
+	const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+	// Save the new password to the user document
+	user.password = hashedNewPassword;
 
     // Save the updated user document
     await user.save();
 
-    // Send the password reset email to the user's email address
-    // You can use a library like Nodemailer to send the email
 	 // Send an email to the user with the new password
-	 await sendResetEmail(email, resetToken);
+	 await sendResetEmail(email, newPassword);
 
     res.status(200).json({ message: "Password reset email sent" });
   } catch (error) {

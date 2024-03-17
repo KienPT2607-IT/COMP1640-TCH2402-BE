@@ -7,7 +7,7 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/user");
 var rolesRouter = require("./routes/role");
 var facultiesRouter = require("./routes/faculty");
-var magazinesRouter = require("./routes/magazine");
+var eventRouter = require("./routes/event");
 var contributionsRouter = require("./routes/contribution");
 var commentsRouter = require("./routes/comment");
 
@@ -34,7 +34,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/roles", rolesRouter);
 app.use("/faculties", facultiesRouter);
-app.use("/magazines", magazinesRouter);
+app.use("/event", eventRouter);
 app.use("contributions", contributionsRouter);
 app.use("/comments", commentsRouter);
 
