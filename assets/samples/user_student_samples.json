@@ -1,0 +1,86 @@
+[
+	{
+		"_id": {
+			"$oid": "65e49824a0382d744f8d4a81"
+		},
+		"full_name": "Eva Williams",
+		"email": "eva.williams@gmail.com",
+		"password": "123456",
+		"dob": "1992-09-30",
+		"phone_number": "0912345678",
+		"gender": false,
+		"profile_picture": "eva_williams.jpg",
+		"last_login": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"registration_date": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"account_status": true,
+		"faculty": {
+			"$oid": "65e4543fa0382d744f8d4a72"
+		},
+		"created_by": {
+			"$oid": "65e49491a0382d744f8d4a7b"
+		},
+		"role": {
+			"$oid": "65e45058a0382d744f8d4a67"
+		}
+	},
+	{
+		"_id": {
+			"$oid": "65e49824a0382d744f8d4a82"
+		},
+		"full_name": "David Miller",
+		"email": "david.miller@gmail.com",
+		"password": "123456",
+		"dob": "1983-05-12",
+		"phone_number": "0543210987",
+		"gender": true,
+		"profile_picture": "david_miller.png",
+		"last_login": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"registration_date": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"account_status": true,
+		"faculty": {
+			"$oid": "65e4543fa0382d744f8d4a73"
+		},
+		"created_by": {
+			"$oid": "65e49491a0382d744f8d4a7c"
+		},
+		"role": {
+			"$oid": "65e45058a0382d744f8d4a67"
+		}
+	},
+	{
+		"_id": {
+			"$oid": "65e49824a0382d744f8d4a83"
+		},
+		"full_name": "Grace Taylor",
+		"email": "grace.taylor@gmail.com",
+		"password": "123456",
+		"dob": "1998-11-05",
+		"phone_number": "0789456123",
+		"gender": false,
+		"profile_picture": "grace_taylor.gif",
+		"last_login": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"registration_date": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"account_status": true,
+		"faculty": {
+			"$oid": "65e4543fa0382d744f8d4a74"
+		},
+		"created_by": {
+			"$oid": "65e49491a0382d744f8d4a7d"
+		},
+		"role": {
+			"$oid": "65e45058a0382d744f8d4a67"
+		}
+	}
+]

@@ -1,0 +1,158 @@
+[
+	{
+		"_id": {
+			"$oid": "65e4af9ba0382d744f8d4a88"
+		},
+		"full_name": "Guest",
+		"email": "it-guest1@gmail.com",
+		"password": "123456",
+		"gender": true,
+		"profile_picture": "guest.jpg",
+		"last_login": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"registration_date": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"account_status": true,
+		"faculty": {
+			"$oid": "65e4543fa0382d744f8d4a72"
+		},
+		"created_by": {
+			"$oid": "65e49491a0382d744f8d4a7b"
+		},
+		"role": {
+			"$oid": "65e45058a0382d744f8d4a68"
+		}
+	},
+	{
+		"_id": {
+			"$oid": "65e4af9ba0382d744f8d4a89"
+		},
+		"full_name": "Guest",
+		"email": "it-guest2@gmail.com",
+		"password": "123456",
+		"gender": false,
+		"profile_picture": "guest.jpg",
+		"last_login": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"registration_date": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"account_status": false,
+		"faculty": {
+			"$oid": "65e4543fa0382d744f8d4a72"
+		},
+		"created_by": {
+			"$oid": "65e49491a0382d744f8d4a7b"
+		},
+		"role": {
+			"$oid": "65e45058a0382d744f8d4a68"
+		}
+	},
+	{
+		"_id": {
+			"$oid": "65e4af9ba0382d744f8d4a8a"
+		},
+		"full_name": "Guest",
+		"email": "gd-guest1@gmail.com",
+		"password": "123456",
+		"gender": true,
+		"profile_picture": "guest.jpg",
+		"last_login": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"registration_date": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"account_status": true,
+		"faculty": {
+			"$oid": "65e4543fa0382d744f8d4a73"
+		},
+		"created_by": {
+			"$oid": "65e49491a0382d744f8d4a7c"
+		},
+		"role": {
+			"$oid": "65e45058a0382d744f8d4a68"
+		}
+	},
+	{
+		"_id": {
+			"$oid": "65e4af9ba0382d744f8d4a8b"
+		},
+		"full_name": "Guest",
+		"email": "gd-guest2@gmail.com",
+		"password": "123456",
+		"gender": false,
+		"profile_picture": "guest.jpg",
+		"last_login": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"registration_date": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"account_status": true,
+		"faculty": {
+			"$oid": "65e4543fa0382d744f8d4a73"
+		},
+		"created_by": {
+			"$oid": "65e49491a0382d744f8d4a7c"
+		},
+		"role": {
+			"$oid": "65e45058a0382d744f8d4a68"
+		}
+	},
+	{
+		"_id": {
+			"$oid": "65e4af9ba0382d744f8d4a8c"
+		},
+		"full_name": "Guest",
+		"email": "bm-guest1@gmail.com",
+		"password": "123456",
+		"gender": true,
+		"profile_picture": "guest.jpg",
+		"last_login": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"registration_date": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"account_status": true,
+		"faculty": {
+			"$oid": "65e4543fa0382d744f8d4a74"
+		},
+		"created_by": {
+			"$oid": "65e49491a0382d744f8d4a7d"
+		},
+		"role": {
+			"$oid": "65e45058a0382d744f8d4a68"
+		}
+	},
+	{
+		"_id": {
+			"$oid": "65e4af9ba0382d744f8d4a8d"
+		},
+		"full_name": "Guest",
+		"email": "bm-guest2@gmail.com",
+		"password": "123456",
+		"gender": false,
+		"profile_picture": "guest.jpg",
+		"last_login": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"registration_date": {
+			"$date": "2024-03-03T12:30:00.000Z"
+		},
+		"account_status": true,
+		"faculty": {
+			"$oid": "65e4543fa0382d744f8d4a74"
+		},
+		"created_by": {
+			"$oid": "65e49491a0382d744f8d4a7d"
+		},
+		"role": {
+			"$oid": "65e45058a0382d744f8d4a68"
+		}
+	}
+]

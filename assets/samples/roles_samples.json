@@ -1,0 +1,37 @@
+[
+	{
+		"_id": {
+			"$oid": "65e45058a0382d744f8d4a64"
+		},
+		"name": "Marketing Manager",
+		"status": true
+	},
+	{
+		"_id": {
+			"$oid": "65e45058a0382d744f8d4a65"
+		},
+		"name": "marketing Coordinator",
+		"status": true
+	},
+	{
+		"_id": {
+			"$oid": "65e45058a0382d744f8d4a66"
+		},
+		"name": "Admin",
+		"status": true
+	},
+	{
+		"_id": {
+			"$oid": "65e45058a0382d744f8d4a67"
+		},
+		"name": "Student",
+		"status": true
+	},
+	{
+		"_id": {
+			"$oid": "65e45058a0382d744f8d4a68"
+		},
+		"name": "Guest",
+		"status": true
+	}
+]
