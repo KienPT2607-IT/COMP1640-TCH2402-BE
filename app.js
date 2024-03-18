@@ -17,7 +17,9 @@ var mongoose = require("mongoose");
 var cors = require("cors");
 
 // const db = "mongodb://localhost:27017/comp1640"; // local database url connection
-const db = process.env.DB_CONNECTION_STRING; // database url connection
+// const db = process.env.DB_CONNECTION_STRING; // database url connection
+const db =
+	"mongodb+srv://kienptgch200815:s3klELOzHOcr9Uer@cluster0.yunqwou.mongodb.net/comp1640"; // database url connection
 var app = express();
 
 mongoose
