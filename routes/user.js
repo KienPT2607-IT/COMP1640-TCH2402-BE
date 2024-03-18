@@ -1,7 +1,6 @@
 require("dotenv").config();
 
 var express = require("express");
-var router = express.Router();
 const UserModel = require("../models/UserModel");
 const FacultyModel = require("../models/FacultyModel");
 const RoleModel = require("../models/RoleModel");
@@ -11,18 +10,21 @@ const bcrypt = require("bcryptjs");
 const { isAuth } = require("../middlewares/auth");
 const tokenSecret = process.env.TOKEN_SECRET_KEY;
 const saltRounds = process.env.SALT_ROUNDS;
+var router = express.Router();
 
 // * GET users listing.
-router.get("/", async (req, res) => {
+router.get("/", isAuth(["Admin"]), async (req, res) => {
 	try {
 		let users = await UserModel.find();
-		console.log(users.length);
-
+		if (users.length <= 0) {
+			res.status(400).json({
+				message: "No users found!",
+			});
+		}
 		res.status(200).json({
 			data: users,
 		});
 	} catch (error) {
-		console.log("Found an error:" + error);
 		res.status(404).json({
 			error: error.message,
 		});

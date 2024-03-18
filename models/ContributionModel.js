@@ -15,21 +15,23 @@ var ContributionSchema = Schema({
 	},
 	like_count: {
 		type: Number,
-		min: 0
+		min: 0,
+		default: 0
 	},
 	dislike_count: {
 		type: Number,
-		min: 0
+		min: 0,
+		default: 0
 	},
 	submission_date: {
 		type: Date,
 		required: true,
 		default: Date.now,
 	},
-	last_update: {
-		type: Date,
+	is_accepted: {
 		required: true,
-		default: Date.now,
+		type: Boolean,
+		default: false,
 	},
 	event: {
 		type: SchemaTypes.ObjectId,

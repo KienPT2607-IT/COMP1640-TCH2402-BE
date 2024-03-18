@@ -23,11 +23,6 @@ var EventSchema = Schema({
 		require: true,
 		default: true,
 	},
-	last_update: {
-		type: Date,
-		require: true,
-		default: Date.now,
-	},
 	create_by: {
 		type: SchemaTypes.ObjectId,
 		ref: "users",
