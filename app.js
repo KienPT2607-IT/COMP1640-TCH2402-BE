@@ -27,7 +27,7 @@ mongoose
 	.then(() => console.log("Connected to db successfully!"))
 	.catch((err) => console.log("Failed to connect to db. \nError: " + err));
 
-// app.use(cors());
+app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -39,7 +39,7 @@ app.use("/users", usersRouter);
 app.use("/roles", rolesRouter);
 app.use("/faculties", facultiesRouter);
 app.use("/events", eventsRouter);
-app.use("contributions", contributionsRouter);
+app.use("/contributions", contributionsRouter);
 app.use("/comments", commentsRouter);
 
 module.exports = app;
