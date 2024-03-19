@@ -3,36 +3,55 @@ const ContributionModel = require("../models/ContributionModel");
 const { isAuth } = require("../middlewares/auth");
 
 const multer = require("multer");
+var prefix = Date.now() + "_" + Math.floor(Math.random() * 1000);
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
-		cb(null, "./public/uploads/documents/");
+		cb(null, "./public/uploads/"); //set image upload location
 	},
 	filename: (req, file, cb) => {
-		const filename = Date.now() + "_" + file.originalname;
-		cb(null, filename);
+		let fileName = prefix + file.originalname; //set final image name
+		cb(null, fileName);
 	},
 });
+
+const upload = multer({ storage: storage });
+
 var router = express.Router();
 
 // * Add contribution - Not done yet.
-router.post("/add", isAuth(["Student"]), async (req, res) => {
-	try {
-		const { event, description } = req.body;
-		const contribution = new ContributionModel({
-			event: event,
-			description: description,
-			student: req._id,
-		});
-		await contribution.save();
-		res.status(200).json({
-			message: "Contribution added successfully!",
-		});
-	} catch (error) {
-		res.status(500).json({
-			error: error.message,
-		});
+/* 
+	TODO:
+	// check if the user is a student 
+	check if the files are valid
+	check if the student is in the same faculty as the event
+	check if the event is still open for contributions
+*/
+router.post(
+	"/create",
+	isAuth(["Student"]),
+	upload.single("image"),
+	async (req, res) => {
+		try {
+			// const { content, event } = req.body;
+			const { content, event } = JSON.parse(req.body.data);
+			const contribution = await ContributionModel.create({
+				content: content,
+				image: req.file.path,
+				contributor: req._id,
+				event: event,
+			});
+			console.log(contribution);
+			res.status(200).json({
+				message: "Contribution added successfully!",
+			});
+		} catch (error) {
+			console.log(error);
+			res.status(500).json({
+				error: error.message,
+			});
+		}
 	}
-});
+);
 
 // * GET contributions listing - Only the accepted contributions will be shown.
 router.get(
