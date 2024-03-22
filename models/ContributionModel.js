@@ -5,11 +5,7 @@ var ContributionSchema = Schema({
 		type: String,
 		required: true,
 	},
-	// document: {
-	// 	type: String,
-	// 	required: true,
-	// },
-	image: {
+	document_des_path: {
 		type: String,
 		required: true,
 	},
@@ -41,6 +37,7 @@ var ContributionSchema = Schema({
 	event: {
 		type: SchemaTypes.ObjectId,
 		ref: "events",
+		required: true,
 	},
 });
 
