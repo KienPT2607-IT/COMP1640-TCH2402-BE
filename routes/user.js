@@ -10,7 +10,8 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { isAuth } = require("../middlewares/auth");
 const tokenSecret = process.env.TOKEN_SECRET_KEY;
-const saltRounds = process.env.SALT_ROUNDS;
+const saltRounds = 8;
+const nodemailer = require("nodemailer");
 
 // * GET users listing.
 router.get("/", isAuth(["Admin"]), async (req, res) => {
