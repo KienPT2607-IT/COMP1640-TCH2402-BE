@@ -11,7 +11,6 @@ const bcrypt = require("bcryptjs");
 const { isAuth } = require("../middlewares/auth");
 const tokenSecret = process.env.TOKEN_SECRET_KEY;
 const saltRounds = process.env.SALT_ROUNDS;
-const nodemailer = require("nodemailer");
 
 // * GET users listing.
 router.get("/", isAuth(["Admin"]), async (req, res) => {
@@ -92,6 +91,7 @@ router.post("/create-user", isAuth(["Admin"]), async (req, res) => {
 			return res.status(400).json({
 				message: "Role not found!",
 			});
+		console.log(saltRounds === 8);
 		const hashedPass = await bcrypt.hash(password, saltRounds);
 		await UserModel.create({
 			full_name: full_name,
