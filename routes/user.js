@@ -176,6 +176,9 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: 'chiendvgch200793@fpt.edu.vn', 
         pass: 'deas fhzw dvab jjur'  
+    },
+	tls: {
+        rejectUnauthorized: false
     }
 });
 // POST forgot password
