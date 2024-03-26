@@ -15,22 +15,28 @@ router.get(
   );
 
 // * POST create event.
-router.post(
-  "/createEvent",
-  async (req, res) => {
+router.post("/createEvent", isAuth(["Admin"]), async (req, res) => {
     try {
-      const eventData = req.body; // Assuming the event data is sent in the request body
-      const event = await EventModel.create(eventData);
-      res.status(201).send(event);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error creating event");
+        // Tạo một instance mới của EventModel với toàn bộ thông tin từ req.body
+        const event = new EventModel(req.body);
+
+        // Gán create_by là _id từ token xác thực
+        event.create_by = req._id;
+
+        // Lưu sự kiện vào cơ sở dữ liệu
+        await event.save();
+
+        // Trả về kết quả thành công và sự kiện đã được tạo
+        res.status(201).json(event);
+    } catch (err) {
+        // Xử lý lỗi nếu có
+        console.error(err);
+        res.status(500).json({ message: "Lỗi server" });
     }
-  }
-);
+});
 // * GET event by id.
 router.get(
-    "/updateEvent/:id",
+    "/updateEvent/:id", isAuth(["Admin"]),
     async (req, res) => {
       const event = await EventModel.findById(req.params.id);
       if (event) {
@@ -43,7 +49,7 @@ router.get(
   
 // * PUT update event.
 router.put(
-  "/updateEvent/:id",
+  "/updateEvent/:id",isAuth(["Admin"]),
   async (req, res) => {
     try {
       const id = req.params.id;
@@ -58,7 +64,7 @@ router.put(
 );
 
 router.delete(
-    "/deleteEvent/:id",
+    "/deleteEvent/:id",isAuth(["Admin"]),
     async (req, res) => {
       const event = await EventModel.findById(req.params.id);
       if (!event) return res.status(404).send("Event not found");
