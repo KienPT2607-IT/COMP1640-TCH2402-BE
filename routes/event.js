@@ -1,3 +1,6 @@
+require("dotenv").config();
+const { isAuth } = require("../middlewares/auth");
+
 var express = require("express");
 var router = express.Router();
 const EventModel = require("../models/EventModel");
@@ -63,5 +66,7 @@ router.delete(
       res.send(event);
     }
   );
+
+router.get("/", isAuth(["Student"]))
 
 module.exports = router;

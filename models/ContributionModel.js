@@ -1,39 +1,43 @@
 const { Schema, model, SchemaTypes } = require("mongoose");
 
 var ContributionSchema = Schema({
-	title: {
+	content: {
 		type: String,
 		required: true,
 	},
-	content: {
+	document_des_path: {
 		type: String,
-		unique: true,
-	},
-	image: {
-		type: String,
-		unique: true,
+		required: true,
 	},
 	like_count: {
 		type: Number,
-		min: 0
+		min: 0,
+		default: 0,
 	},
 	dislike_count: {
 		type: Number,
-		min: 0
+		min: 0,
+		default: 0,
 	},
 	submission_date: {
 		type: Date,
 		required: true,
 		default: Date.now,
 	},
-	last_update: {
-		type: Date,
+	is_accepted: {
 		required: true,
-		default: Date.now,
+		type: Boolean,
+		default: false,
+	},
+	contributor: {
+		type: SchemaTypes.ObjectId,
+		ref: "users",
+		required: true,
 	},
 	event: {
 		type: SchemaTypes.ObjectId,
 		ref: "events",
+		required: true,
 	},
 });
 
