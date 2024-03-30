@@ -13,12 +13,41 @@ const tokenSecret = process.env.TOKEN_SECRET_KEY;
 const saltRounds = 8;
 const nodemailer = require("nodemailer");
 
-// * GET users listing.
+// * GET users listing. ✅
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: Retrieve a list of users
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     responses:
+ *       200:
+ *         description: A list of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserArray'
+ *       401:
+ *         description: Authentication is required!/Token authorization failed, authorization denied!/Not authorized to perform this action, authorization denied!
+ *       404:
+ *         description: No users found
+ *       500:
+ *         description: Some server error
+ */
 router.get("/", isAuth(["Admin"]), async (req, res) => {
 	try {
-		let users = await UserModel.find();
+		let users = await UserModel.find().populate("faculty").populate("role");
 		if (users.length <= 0) {
-			res.status(400).json({
+			res.status(404).json({
 				message: "No users found!",
 			});
 		}
@@ -26,12 +55,46 @@ router.get("/", isAuth(["Admin"]), async (req, res) => {
 			data: users,
 		});
 	} catch (error) {
-		res.status(404).json({
+		res.status(500).json({
 			error: error.message,
 		});
 	}
 });
 
+// * POST login. ✅
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Log in a user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: The user's email.
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 description: The user's password.
+ *     responses:
+ *       200:
+ *         description: The user was successfully logged in.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LoginResponse'
+ *       400:
+ *         description: User with this email does not exist!
+ *       500:
+ *         description: Some server error.
+ */
 router.post("/login", async (req, res) => {
 	try {
 		const { email, password } = req.body;
@@ -69,6 +132,63 @@ router.post("/login", async (req, res) => {
 	}
 });
 
+// * POST create user. ✅
+/**
+ * @swagger
+ * /create-user:
+ *   post:
+ *     summary: Create a new user
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               full_name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 format: password
+ *               dob:
+ *                 type: string
+ *                 format: date
+ *               gender:
+ *                 type: boolean
+ *               phone_number:
+ *                 type: string
+ *               faculty:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: The user was successfully created.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Faculty not found!/Role not found!
+ *       500:
+ *         description: Some server error.
+ */
 router.post("/create-user", isAuth(["Admin"]), async (req, res) => {
 	try {
 		const {
@@ -78,21 +198,20 @@ router.post("/create-user", isAuth(["Admin"]), async (req, res) => {
 			dob,
 			gender,
 			phone_number,
-			profile_picture,
 			faculty,
 			role,
 		} = req.body;
 		const _faculty = await FacultyModel.findOne({ name: faculty });
 		if (!_faculty)
-			return res.status(400).json({
+			return res.status(404).json({
 				message: "Faculty not found!",
 			});
+
 		const _role = await RoleModel.findOne({ name: role });
 		if (!_role)
-			return res.status(400).json({
+			return res.status(404).json({
 				message: "Role not found!",
 			});
-		console.log(saltRounds === 8);
 		const hashedPass = await bcrypt.hash(password, saltRounds);
 		await UserModel.create({
 			full_name: full_name,
@@ -101,7 +220,6 @@ router.post("/create-user", isAuth(["Admin"]), async (req, res) => {
 			dob: dob,
 			phone_number: phone_number,
 			gender: gender,
-			profile_picture: profile_picture,
 			registration_date: getCurrentDate(),
 			faculty: _faculty._id,
 			role: _role._id,
@@ -110,7 +228,6 @@ router.post("/create-user", isAuth(["Admin"]), async (req, res) => {
 			message: "Account added successfully!",
 		});
 	} catch (error) {
-		console.log("Found an error:" + error);
 		res.status(500).json({
 			error: error.message,
 		});
