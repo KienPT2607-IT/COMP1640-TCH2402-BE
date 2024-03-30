@@ -155,23 +155,26 @@ router.post(
 	}
 );
 
-//  * Reject contribution by id
+//  * Reject contribution by id 90%✅
 // - Only the event creator can reject the contributions.
 router.delete(
 	"/reject/:id",
 	isAuth(["Marketing Coordinator"]),
 	async (req, res) => {
 		try {
-			const contribution = await ContributionModel.findByIdAndDelete(
-				req.params.id
-			);
+			const contribution = await ContributionModel.findOne({
+				_id: req.params.id,
+			}).populate({ path: "event", match: { creator: req._id } });
+
 			if (!contribution)
 				return res.status(404).json({
-					message: "Contribution not found!",
+					message: "Contribution not found or not authorization",
 				});
 
+			await ContributionModel.findByIdAndDelete(req.params.id);
+			// Todo: Delete the folder of this contribution.
 			res.status(200).json({
-				message: "Contribution deleted!",
+				message: "Contribution rejected!",
 			});
 		} catch (error) {
 			res.status(500).json({ error: error.message });
@@ -180,19 +183,23 @@ router.delete(
 );
 
 // * Delete contribution by id.
-// - Only the contributor can delete and only accepted contributions are deletable.
+// - Only the contributor and the event creator can delete and only accepted contributions are deletable.
 router.delete(
 	"/delete/:id",
 	isAuth(["Student", "Marketing Coordinator"]),
 	async (req, res) => {
 		try {
-			const contribution = await ContributionModel.findByIdAndDelete(
-				req.params.id
-			);
+			const contribution = await ContributionModel.findOne({
+				_id: req.params.id,
+				is_accepted: true,
+			}).populate({ path: "event", match: { creator: req._id } });
+
 			if (!contribution)
 				return res.status(404).json({
 					message: "Contribution not found!",
 				});
+			
+			await ContributionModel.findByIdAndDelete(req.params.id);
 			// Todo: Delete the folder of this contribution.
 			res.status(200).json({
 				message: "Contribution deleted!",
@@ -203,11 +210,11 @@ router.delete(
 	}
 );
 
-// * Like contribution.
-// - Only the students, marketing coordinators, and marketing managers can like the accepted contributions.
+// * Like contribution. ✅
+// - Only the students can like the accepted contributions.
 router.put(
 	"/like/:id",
-	isAuth(["Student", "Marketing Coordinator", "Marketing Manger"]),
+	isAuth(["Student"]),
 	async (req, res) => {
 		try {
 			var contribution = await ContributionModel.findOne({
@@ -230,10 +237,10 @@ router.put(
 );
 
 // * Unlike contribution.
-// - Only the students, marketing coordinators, and marketing managers can unlike the accepted contributions.
+// - Only the students can unlike the accepted contributions.
 router.put(
 	"/unlike/:id",
-	isAuth(["Student", "Marketing Coordinator", "Marketing Manger"]),
+	isAuth(["Student"]),
 	async (req, res) => {
 		try {
 			var contribution = await ContributionModel.findOne({
@@ -256,56 +263,48 @@ router.put(
 );
 
 // * Dislike contribution.
-// - Only the students, marketing coordinators, and marketing managers can dislike the accepted contributions.
-router.put(
-	"/dislike/:id",
-	isAuth(["Student", "Marketing Coordinator", "Marketing Manger"]),
-	async (req, res) => {
-		try {
-			var contribution = await ContributionModel.findOne({
-				id: req.params.id,
-				is_accepted: true,
+// - Only the students can dislike the accepted contributions.
+router.put("/dislike/:id", isAuth(["Student"]), async (req, res) => {
+	try {
+		var contribution = await ContributionModel.findOne({
+			id: req.params.id,
+			is_accepted: true,
+		});
+		if (!contribution)
+			return res.status(404).json({
+				message: "Contribution not found!",
 			});
-			if (!contribution)
-				return res.status(404).json({
-					message: "Contribution not found!",
-				});
-			contribution.dislike_count += 1;
-			await contribution.save();
-			res.status(200).json({
-				message: "Contribution disliked!",
-			});
-		} catch (error) {
-			res.status(500).json({ error: error.message });
-		}
+		contribution.dislike_count += 1;
+		await contribution.save();
+		res.status(200).json({
+			message: "Contribution disliked!",
+		});
+	} catch (error) {
+		res.status(500).json({ error: error.message });
 	}
-);
+});
 
 // * Un-dislike contribution.
-// - Only the students, marketing coordinators, and marketing managers can dislike the accepted contributions.
-router.put(
-	"/undislike/:id",
-	isAuth(["Student", "Marketing Coordinator", "Marketing Manger"]),
-	async (req, res) => {
-		try {
-			var contribution = await ContributionModel.findOne({
-				id: req.params.id,
-				is_accepted: true,
+// - Only the students can dislike the accepted contributions.
+router.put("/undislike/:id", isAuth(["Student"]), async (req, res) => {
+	try {
+		var contribution = await ContributionModel.findOne({
+			id: req.params.id,
+			is_accepted: true,
+		});
+		if (!contribution)
+			return res.status(404).json({
+				message: "Contribution not found!",
 			});
-			if (!contribution)
-				return res.status(404).json({
-					message: "Contribution not found!",
-				});
-			contribution.dislike_count -= 1;
-			await contribution.save();
-			res.status(200).json({
-				message: "Contribution un-disliked!",
-			});
-		} catch (error) {
-			res.status(500).json({ error: error.message });
-		}
+		contribution.dislike_count -= 1;
+		await contribution.save();
+		res.status(200).json({
+			message: "Contribution un-disliked!",
+		});
+	} catch (error) {
+		res.status(500).json({ error: error.message });
 	}
-);
+});
 
 // * Download contributions
 
