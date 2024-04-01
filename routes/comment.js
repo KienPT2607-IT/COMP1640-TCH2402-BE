@@ -5,7 +5,7 @@ const ContributionModel = require("../models/ContributionModel");
 const { isAuth } = require("../middleware/auth");
 
 // Create a new comment
-router.post("/", isAuth(["user"]), async (req, res) => {
+router.post("/create", isAuth(["Student"]), async (req, res) => {
   try {
     const { content, contribution } = req.body;
 
@@ -56,7 +56,7 @@ router.get("/:contributionId", async (req, res) => {
   });
 
   // Route để người dùng like một comment
-router.put('/comment/:commentId/like', isAuth, async (req, res) => {
+router.put('/like/:commentId', isAuth(["Student"]), async (req, res) => {
     try {
       const { commentId } = req.params;
   
@@ -76,7 +76,7 @@ router.put('/comment/:commentId/like', isAuth, async (req, res) => {
   });
   
   // Route để người dùng dislike một comment
-  router.put('/comment/:commentId/dislike', isAuth, async (req, res) => {
+  router.put('/dislike/:commentId', isAuth(["Student"]), async (req, res) => {
     try {
       const { commentId } = req.params;
   

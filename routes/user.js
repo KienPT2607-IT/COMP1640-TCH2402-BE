@@ -302,8 +302,8 @@ const transporter = nodemailer.createTransport({
 	port: 587, // Cổng SMTP
 	secure: false, // Nếu sử dụng SSL/TLS, đặt giá trị là true
 	auth: {
-		user: "chiendvgch200793@fpt.edu.vn",
-		pass: "deas fhzw dvab jjur",
+		user: "your email",
+		pass: "pw app",
 	},
 });
 // POST forgot password
@@ -340,7 +340,7 @@ router.post("/forgot-password", async (req, res) => {
 });
 async function sendResetEmail(email, resetToken) {
 	const mailOptions = {
-		from: "chiendvgch200793@fpt.edu.vn",
+		from: "your email",
 		to: email,
 		subject: "Password Reset",
 		text: `The new password is: ${resetToken}`,
