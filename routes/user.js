@@ -168,65 +168,7 @@ router.get(
 
 //----------------------------Forgot-password------------------------------
 
-  // Phần cấu hình transporter
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com', // Địa chỉ SMTP server 
-    port: 587, // Cổng SMTP
-    secure: false, // Nếu sử dụng SSL/TLS, đặt giá trị là true
-    auth: {
-        user: 'chiendvgch200793@fpt.edu.vn', 
-        pass: 'deas fhzw dvab jjur'  
-    },
-	tls: {
-        rejectUnauthorized: false
-    }
-});
-// POST forgot password
-router.post("/forgot-password", async (req, res) => {
-  try {
-    const { email } = req.body;
 
-    // Check if the user exists in the database
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Generate a random password reset token
-    const newPassword = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-
-
-	const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
-	// Save the new password to the user document
-	user.password = hashedNewPassword;
-
-    // Save the updated user document
-    await user.save();
-
-	 // Send an email to the user with the new password
-	 await sendResetEmail(email, newPassword);
-
-    res.status(200).json({ message: "Password reset email sent" });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-async function sendResetEmail(email, resetToken) {
-    const mailOptions = {
-        from: 'chiendvgch200793@fpt.edu.vn',
-        to: email,
-        subject: 'Password Reset',
-        text: `The new password is: ${resetToken}`,
-    };
-
-    try {
-        await transporter.sendMail(mailOptions);
-        console.log('Email sent successfully');
-    } catch (error) {
-        console.error('Error sending email:', error);
-    }
-}
 
 //--------------------------Delete account-------------------------
 router.delete("/:id", async (req, res) => {
