@@ -1,13 +1,11 @@
 var express = require("express");
 const ContributionModel = require("../models/ContributionModel");
 const { isAuth } = require("../middlewares/auth");
-const { getUploadMiddleware } = require("../middlewares/upload");
-// const { clearDirectory } = require("../middlewares/upload");
+const { getUploadMiddleware, removeFiles } = require("../middlewares/upload");
+const fs = require("fs");
+const archiver = require("archiver");
+const path = require("path");
 const { contributionBasePath } = require("../utilities/constants");
-const { Types } = require("mongoose");
-const multer = require("multer");
-const upload = multer();
-
 var router = express.Router();
 
 // * Add contribution. ✅
@@ -20,7 +18,7 @@ router.post(
 			const { content, event } = req.body;
 			await ContributionModel.create({
 				content: content,
-				document_des_path: `${event}/${req._id}`,
+				uploads: req._files,
 				contributor: req._id,
 				event: event,
 			});
@@ -83,7 +81,6 @@ router.get(
 				data: contributions,
 			});
 		} catch (error) {
-			console.log(error);
 			res.status(500).json({
 				error: error.message,
 			});
@@ -126,51 +123,50 @@ router.put(
 router.post(
 	"/update/:id",
 	isAuth(["Student"]),
-	// getUploadMiddleware("contributions", "documents", 5),
+	getUploadMiddleware("contributions", "documents", 5),
 	async (req, res) => {
 		try {
-			// Todo: Save the updated files in the new des path and delete the old path
-			console.log(req.body);
-			const contribution = await ContributionModel.findOne({
+			const doc = await ContributionModel.findOne({
 				_id: req.params.id,
+				is_accepted: true,
 			}).populate({ path: "contributor", match: { _id: req._id } });
-			if (!contribution)
+			if (!doc)
 				return res.status(404).json({
 					message: "Contribution not found!",
 				});
-			if (!contribution.is_accepted)
-				return res.status(403).json({
-					message: "Only accepted contributions are updatable!",
-				});
 
-			contribution.content = req.body.content;
-			await contribution.save();
+			doc.content = req.body.content;
+			// TODO: Save the updated files and delete the old ones
+			// TODO: -> Need to test
+			removeFiles(doc.uploads, `${doc.event._id}/${req._id}`);
+			doc.uploads = req._files;
+			await doc.save();
 			res.status(200).json({
 				message: "Contribution updated!",
 			});
 		} catch (error) {
-			console.log(error);
 			res.status(500).json({ error: error.message });
 		}
 	}
 );
 
-//  * Reject contribution by id 90%✅
+//  * Reject contribution by id
 // - Only the event creator can reject the contributions.
 router.delete(
 	"/reject/:id",
 	isAuth(["Marketing Coordinator"]),
 	async (req, res) => {
 		try {
-			const contribution = await ContributionModel.findOne({
-				_id: req.params.id,
-			}).populate({ path: "event", match: { creator: req._id } });
-
-			if (!contribution)
+			const doc = await ContributionModel.findById(
+				req.params.id
+			).populate({ path: "event", match: { create_by: req._id } });
+			if (!doc)
 				return res.status(404).json({
 					message: "Contribution not found or not authorization",
 				});
+			// TODO: check if date now is over closure date
 
+			removeFiles(doc.uploads, `${doc.event._id}/${doc.contributor}`);
 			await ContributionModel.findByIdAndDelete(req.params.id);
 			// Todo: Delete the folder of this contribution.
 			res.status(200).json({
@@ -183,99 +179,93 @@ router.delete(
 );
 
 // * Delete contribution by id.
-// - Only the contributor and the event creator can delete and only accepted contributions are deletable.
-router.delete(
-	"/delete/:id",
-	isAuth(["Student", "Marketing Coordinator"]),
-	async (req, res) => {
-		try {
-			const contribution = await ContributionModel.findOne({
-				_id: req.params.id,
-				is_accepted: true,
-			}).populate({ path: "event", match: { creator: req._id } });
-
-			if (!contribution)
-				return res.status(404).json({
-					message: "Contribution not found!",
-				});
-			
-			await ContributionModel.findByIdAndDelete(req.params.id);
-			// Todo: Delete the folder of this contribution.
-			res.status(200).json({
-				message: "Contribution deleted!",
+// - Only the contributor can delete his/her contribution.
+router.delete("/delete/:id", isAuth(["Student"]), async (req, res) => {
+	try {
+		const doc = await ContributionModel.findOne({
+			_id: req.params.id,
+			is_accepted: true,
+		}).populate({ path: "contributor", match: { _id: req._id } });
+		// TODO: check if date now is over closure date
+		if (!doc)
+			return res.status(404).json({
+				message: "Contribution not found!",
 			});
-		} catch (error) {
-			res.status(500).json({ error: error.message });
-		}
+		removeFiles(doc.uploads, `${doc.event._id}/${doc.contributor._id}`);
+		await ContributionModel.findByIdAndDelete(req.params.id);
+		res.status(200).json({
+			message: "Contribution deleted!",
+		});
+	} catch (error) {
+		res.status(500).json({ error: error.message });
 	}
-);
+});
 
 // * Like contribution. ✅
+// TODO: need to test again before present on 1/4
 // - Only the students can like the accepted contributions.
-router.put(
-	"/like/:id",
-	isAuth(["Student"]),
-	async (req, res) => {
-		try {
-			var contribution = await ContributionModel.findOne({
-				id: req.params.id,
-				is_accepted: true,
+router.put("/like/:id", isAuth(["Student"]), async (req, res) => {
+	try {
+		const doc = await ContributionModel.findOne({
+			_id: req.params.id,
+			is_accepted: true,
+		});
+
+		if (!doc)
+			return res.status(404).json({
+				message: "Contribution not found!",
 			});
-			if (!contribution)
-				return res.status(404).json({
-					message: "Contribution not found!",
-				});
-			contribution.like_count += 1;
-			await contribution.save();
-			res.status(200).json({
-				message: "Contribution liked!",
-			});
-		} catch (error) {
-			res.status(500).json({ error: error.message });
-		}
+		doc.like_count += 1;
+		await doc.save();
+		res.status(200).json({
+			message: "Contribution liked!",
+		});
+	} catch (error) {
+		res.status(500).json({ error: error.message });
 	}
-);
+});
 
 // * Unlike contribution.
 // - Only the students can unlike the accepted contributions.
-router.put(
-	"/unlike/:id",
-	isAuth(["Student"]),
-	async (req, res) => {
-		try {
-			var contribution = await ContributionModel.findOne({
-				id: req.params.id,
-				is_accepted: true,
+router.put("/unlike/:id", isAuth(["Student"]), async (req, res) => {
+	try {
+		const doc = await ContributionModel.findOne({
+			_id: req.params.id,
+			is_accepted: true,
+		});
+
+		if (!doc)
+			return res.status(404).json({
+				message: "Contribution not found!",
 			});
-			if (!contribution)
-				return res.status(404).json({
-					message: "Contribution not found!",
-				});
-			contribution.like_count -= 1;
-			await contribution.save();
-			res.status(200).json({
+		if (doc.like_count > 0) {
+			doc.like_count -= 1;
+			await doc.save();
+			return res.status(200).json({
 				message: "Contribution unliked!",
 			});
-		} catch (error) {
-			res.status(500).json({ error: error.message });
 		}
+		res.status(400).send("like count is zero!");
+	} catch (error) {
+		res.status(500).json({ error: error.message });
 	}
-);
+});
 
 // * Dislike contribution.
 // - Only the students can dislike the accepted contributions.
 router.put("/dislike/:id", isAuth(["Student"]), async (req, res) => {
 	try {
-		var contribution = await ContributionModel.findOne({
-			id: req.params.id,
+		const doc = await ContributionModel.findOne({
+			_id: req.params.id,
 			is_accepted: true,
 		});
-		if (!contribution)
+
+		if (!doc)
 			return res.status(404).json({
 				message: "Contribution not found!",
 			});
-		contribution.dislike_count += 1;
-		await contribution.save();
+		doc.dislike_count += 1;
+		await doc.save();
 		res.status(200).json({
 			message: "Contribution disliked!",
 		});
@@ -288,24 +278,78 @@ router.put("/dislike/:id", isAuth(["Student"]), async (req, res) => {
 // - Only the students can dislike the accepted contributions.
 router.put("/undislike/:id", isAuth(["Student"]), async (req, res) => {
 	try {
-		var contribution = await ContributionModel.findOne({
-			id: req.params.id,
+		const doc = await ContributionModel.findOne({
+			_id: req.params.id,
 			is_accepted: true,
 		});
-		if (!contribution)
+
+		if (!doc)
 			return res.status(404).json({
 				message: "Contribution not found!",
 			});
-		contribution.dislike_count -= 1;
-		await contribution.save();
-		res.status(200).json({
-			message: "Contribution un-disliked!",
-		});
+		if (doc.dislike_count > 0) {
+			doc.dislike_count -= 1;
+			await doc.save();
+			return res.status(200).json({
+				message: "Contribution un-disliked!",
+			});
+		}
+		res.status(400).send("dislike count is zero!");
 	} catch (error) {
 		res.status(500).json({ error: error.message });
 	}
 });
 
 // * Download contributions
+// Only marketing manger can download upload contributions in a event no matter if they are accepted or not
+router.get("/download/:id", isAuth(["Marketing Manager"]), async (req, res) => {
+	try {
+		const docs = await ContributionModel.find({
+			event: req.params.id,
+		}).populate("event");
+		if (!docs) {
+			return res.status(404).json({
+				message: "Contributions of this event not found!",
+			});
+		}
+
+		const folderPath = `${contributionBasePath}/${req.params.id}`;
+		// Create a zip file
+		const zipPath = `./public/downloads/${docs[0].event.name}.zip`;
+		const output = fs.createWriteStream(zipPath);
+		const archive = archiver("zip", {
+			zlib: { level: 9 },
+		});
+		archive.pipe(output);
+
+		// Add all files in the folder to the zip
+		const contributionFolders = fs.readdirSync(folderPath);
+		contributionFolders.forEach((folder) => {
+			const files = fs.readdirSync(path.join(folderPath, folder));
+			files.forEach((file) => {
+				const filePath = path.join(folderPath, folder, file);
+				archive.file(filePath, { name: path.join(folder, file) });
+			});
+		});
+
+		// Finalize the zip file
+		archive.finalize();
+
+		// Send the zip file as a response
+		output.on("close", () => {
+			res.download(zipPath, (err) => {
+				if (err) {
+					res.status(500).json({ error: error.message });
+				} else {
+					// Delete the file after sending it
+					fs.unlinkSync(zipPath);
+				}
+			});
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ error: error.message });
+	}
+});
 
 module.exports = router;

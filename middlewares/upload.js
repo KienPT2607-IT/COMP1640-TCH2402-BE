@@ -5,6 +5,16 @@ const unlink = util.promisify(fs.unlink);
 const { contributionBasePath } = require("../utilities/constants");
 const multer = require("multer");
 
+async function removeFiles(filePaths, dirPath) {
+	
+	for (const filePath of filePaths) {
+		try {
+			const pathToFile = `${contributionBasePath}/${dirPath}/${filePath}`;
+			await unlink(`${contributionBasePath}/${dirPath}/${filePath}`);
+		} catch (error) {}
+	}
+}
+
 function createMulterStorage(desFolder) {
 	return multer.diskStorage({
 		destination: async (req, file, cb) => {
@@ -18,14 +28,16 @@ function createMulterStorage(desFolder) {
 				  );
 			if (!fs.existsSync(desPath))
 				fs.mkdirSync(desPath, { recursive: true });
-
 			cb(null, desPath);
 		},
 		filename: (req, file, cb) => {
 			let random = Math.floor(Math.random() * 1000000) + 1;
 			let fileName =
 				Date.now() + "_" + random + path.extname(file.originalname);
-			req.fileName = fileName;
+			if (!req._files) {
+				req._files = [];
+			}
+			req._files.push(fileName);
 			cb(null, fileName);
 		},
 	});
@@ -47,26 +59,6 @@ function checkFileType(req, file, cb) {
 	}
 }
 
-async function clearDirectory(req, res, next) {
-	console.log(req.body);
-	const desPath = path.join(__dirname, "uploads");
-
-	if (fs.existsSync(desPath)) {
-		// Get the list of files in the destination folder
-		const destinationFiles = await fs.promises.readdir(desPath);
-
-		// Delete all files in the destination folder
-		await Promise.all(
-			destinationFiles.map((file) => unlink(path.join(desPath, file)))
-		);
-	} else {
-		// Create the destination folder
-		fs.mkdirSync(desPath, { recursive: true });
-	}
-
-	next();
-}
-
 function getUploadMiddleware(desFolder, field, maxCount = null) {
 	const storage = createMulterStorage(desFolder);
 	const upload = multer({
@@ -77,4 +69,4 @@ function getUploadMiddleware(desFolder, field, maxCount = null) {
 	return maxCount ? upload.array(field, maxCount) : upload.single(field);
 }
 
-module.exports = { getUploadMiddleware };
+module.exports = { getUploadMiddleware, removeFiles };
