@@ -9,6 +9,50 @@ const { contributionBasePath } = require("../utilities/constants");
 var router = express.Router();
 
 // * Add contribution. ✅
+/**
+ * @swagger
+ * /create:
+ *   post:
+ *     summary: Add a new contribution
+ *     tags: [Contributions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *               event:
+ *                 type: string
+ *               documents:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       200:
+ *         description: The contribution was successfully added.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       500:
+ *         description: Some server error.
+ */
 router.post(
 	"/create",
 	isAuth(["Student"]),
@@ -36,6 +80,42 @@ router.post(
 
 // * GET contributions listing ✅
 // - Only the accepted contributions will be shown.
+/**
+ * @swagger
+ * /event/{id}:
+ *   get:
+ *     summary: Retrieve the accepted contributions for a specific event
+ *     tags: [Contributions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The event ID
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     responses:
+ *       200:
+ *         description: A list of accepted contributions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Contribution'
+ *       404:
+ *         description: No contributions found
+ */
 router.get(
 	"/:id",
 	isAuth(["Marketing Manager", "Marketing Coordinator", "Student"]),
@@ -64,6 +144,38 @@ router.get(
 
 // * GET contributions listing ✅
 // - Only the request contributions will be shown.
+/**
+ * @swagger
+ * /view/requests:
+ *   get:
+ *     summary: Retrieve the requested contributions
+ *     tags: [Contributions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     responses:
+ *       200:
+ *         description: A list of requested contributions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Contribution'
+ *       404:
+ *         description: No contributions found
+ *       500:
+ *         description: Some server error
+ */
 router.get(
 	"/view/requests",
 	isAuth(["Marketing Coordinator"]),
@@ -90,6 +202,44 @@ router.get(
 
 // * Accept contribution by id ✅
 // - Only the event creator can accept the contributions.
+/**
+ * @swagger
+ * /accept/{id}:
+ *   put:
+ *     summary: Accept a contribution by ID
+ *     tags: [Contributions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The contribution ID
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     responses:
+ *       200:
+ *         description: The contribution was successfully accepted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       403:
+ *         description: You are not authorized to accept this contribution!
+ *       404:
+ *         description: Contribution not found!
+ *       500:
+ *         description: Some server error.
+ */
 router.put(
 	"/accept/:id",
 	isAuth(["Marketing Coordinator"]),
@@ -120,6 +270,7 @@ router.put(
 
 // * Update contribution by id
 // - Only the contributor can update and only accepted contributions are updatable.
+
 router.post(
 	"/update/:id",
 	isAuth(["Student"]),
@@ -150,8 +301,44 @@ router.post(
 	}
 );
 
-//  * Reject contribution by id
+//  * Reject contribution by id 90%✅
 // - Only the event creator can reject the contributions.
+/**
+ * @swagger
+ * /reject/{id}:
+ *   delete:
+ *     summary: Reject a contribution by ID
+ *     tags: [Contributions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The contribution ID
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     responses:
+ *       200:
+ *         description: The contribution was successfully rejected.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Contribution not found or not authorized
+ *       500:
+ *         description: Some server error.
+ */
 router.delete(
 	"/reject/:id",
 	isAuth(["Marketing Coordinator"]),
@@ -180,6 +367,42 @@ router.delete(
 
 // * Delete contribution by id.
 // - Only the contributor can delete his/her contribution.
+/**
+ * @swagger
+ * /delete/{id}:
+ *   delete:
+ *     summary: Delete a contribution by ID
+ *     tags: [Contributions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The contribution ID
+ *       - in: header
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     responses:
+ *       200:
+ *         description: The contribution was successfully deleted.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       404:
+ *         description: Contribution not found
+ *       500:
+ *         description: Some server error.
+ */
 router.delete("/delete/:id", isAuth(["Student"]), async (req, res) => {
 	try {
 		const doc = await ContributionModel.findOne({
