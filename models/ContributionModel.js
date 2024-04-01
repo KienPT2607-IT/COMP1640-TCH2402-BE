@@ -5,8 +5,8 @@ var ContributionSchema = Schema({
 		type: String,
 		required: true,
 	},
-	document_des_path: {
-		type: String,
+	uploads: {
+		type: [String],
 		required: true,
 	},
 	like_count: {
