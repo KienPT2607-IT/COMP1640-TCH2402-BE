@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const CommentModel = require("../models/CommentModel");
 const ContributionModel = require("../models/ContributionModel");
-const { isAuth } = require("../middleware/auth");
+const { isAuth } = require("../middlewares/auth");
 
 // Create a new comment
 router.post("/create", isAuth(["Student"]), async (req, res) => {
