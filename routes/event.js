@@ -6,7 +6,7 @@ var router = express.Router();
 const EventModel = require("../models/EventModel");
 
 // * GET events listing.
-const EventModel = require('./path/to/your/EventModel');
+
 
 router.get("/", isAuth(["Admin"]), async (req, res) => {
   try {
