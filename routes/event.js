@@ -6,13 +6,23 @@ var router = express.Router();
 const EventModel = require("../models/EventModel");
 
 // * GET events listing.
-router.get(
-    "/",isAuth(["Admin"]),
-    async (req, res) => {
-      const events = await EventModel.find({});
-      res.send(events);
+const EventModel = require('./path/to/your/EventModel');
+
+router.get("/", isAuth(["Admin"]), async (req, res) => {
+  try {
+    const events = await EventModel.find({});
+    if (events.length === 0) {
+      return res.status(404).json({ message: "No events found" });
     }
-  );
+    res.status(200).json({
+      data: events
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 // * POST create event.
 router.post("/createEvent", isAuth(["Admin"]), async (req, res) => {
