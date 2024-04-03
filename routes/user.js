@@ -46,7 +46,7 @@ const { getUploadMiddleware } = require("../middlewares/upload");
  */
 router.get("/", isAuth(["Admin"]), async (req, res) => {
 	try {
-		let users = await UserModel.find();
+		let users = await UserModel.find().populate("faculty").populate("role");
 		if (users.length <= 0) {
 			res.status(400).json({
 				message: "No users found!",

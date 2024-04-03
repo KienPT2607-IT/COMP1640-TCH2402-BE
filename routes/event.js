@@ -7,7 +7,7 @@ const EventModel = require("../models/EventModel");
 
 // * GET events listing.
 router.get(
-    "/",
+    "/",isAuth(["Admin"]),
     async (req, res) => {
       const events = await EventModel.find({});
       res.send(events);
