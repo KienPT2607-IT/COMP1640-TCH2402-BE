@@ -448,7 +448,7 @@ router.put("/like/:id", isAuth(["Student"]), async (req, res) => {
 	}
 });
 
-// * Unlike contribution.
+// * Unlike contribution. ✅
 // - Only the students can unlike the accepted contributions.
 router.put("/unlike/:id", isAuth(["Student"]), async (req, res) => {
 	try {
@@ -474,7 +474,7 @@ router.put("/unlike/:id", isAuth(["Student"]), async (req, res) => {
 	}
 });
 
-// * Dislike contribution.
+// * Dislike contribution. ✅
 // - Only the students can dislike the accepted contributions.
 router.put("/dislike/:id", isAuth(["Student"]), async (req, res) => {
 	try {
@@ -497,7 +497,7 @@ router.put("/dislike/:id", isAuth(["Student"]), async (req, res) => {
 	}
 });
 
-// * Un-dislike contribution.
+// * Un-dislike contribution. ✅
 // - Only the students can dislike the accepted contributions.
 router.put("/undislike/:id", isAuth(["Student"]), async (req, res) => {
 	try {
@@ -523,7 +523,7 @@ router.put("/undislike/:id", isAuth(["Student"]), async (req, res) => {
 	}
 });
 
-// * Download contributions
+// * Download contributions ✅
 // Only marketing manger can download upload contributions in a event no matter if they are accepted or not
 router.get("/download/:id", isAuth(["Marketing Manager"]), async (req, res) => {
 	try {
