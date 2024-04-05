@@ -270,8 +270,76 @@ router.put(
 
 // * Update contribution by id
 // - Only the contributor can update and only accepted contributions are updatable.
-
-router.post(
+/**
+ * @swagger
+ * /update/{id}:
+ *   put:
+ *     summary: Update a contribution by id
+ *     description: Only the contributor can update and only accepted contributions are updatable.
+ *     tags:
+ *       - Contributions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the contribution to update
+ *       - in: header
+ *         name: x-auth-token
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 description: The updated content of the contribution
+ *               event:
+ *                 type: string
+ *               documents:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       200:
+ *         description: Contribution updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Contribution updated!
+ *       404:
+ *         description: Contribution not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Contribution not found!
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+router.put(
 	"/update/:id",
 	isAuth(["Student"]),
 	getUploadMiddleware("contributions", "documents", 5),
@@ -425,8 +493,61 @@ router.delete("/delete/:id", isAuth(["Student"]), async (req, res) => {
 });
 
 // * Like contribution. ✅
-// TODO: need to test again before present on 1/4
 // - Only the students can like the accepted contributions.
+/**
+ * @swagger
+ * /like/{id}:
+ *   put:
+ *     summary: Like a contribution by id
+ *     description: Only authenticated students can like and only accepted contributions are likable.
+ *     tags:
+ *       - Contributions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the contribution to like
+ *       - in: header
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Contribution liked successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Contribution liked!
+ *       404:
+ *         description: Contribution not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Contribution not found!
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 router.put("/like/:id", isAuth(["Student"]), async (req, res) => {
 	try {
 		const doc = await ContributionModel.findOne({
@@ -448,8 +569,62 @@ router.put("/like/:id", isAuth(["Student"]), async (req, res) => {
 	}
 });
 
-// * Unlike contribution.
+// * Unlike contribution. ✅
 // - Only the students can unlike the accepted contributions.
+/**
+ * @swagger
+ * /unlike/{id}:
+ *   put:
+ *     summary: Like a contribution by id
+ *     description: Only authenticated students can like and only accepted contributions are likable.
+ *     tags:
+ *       - Contributions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the contribution to like
+ *       - in: header
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Contribution liked successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Contribution liked!
+ *       404:
+ *         description: Contribution not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Contribution not found!
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 router.put("/unlike/:id", isAuth(["Student"]), async (req, res) => {
 	try {
 		const doc = await ContributionModel.findOne({
@@ -474,8 +649,62 @@ router.put("/unlike/:id", isAuth(["Student"]), async (req, res) => {
 	}
 });
 
-// * Dislike contribution.
+// * Dislike contribution. ✅
 // - Only the students can dislike the accepted contributions.
+/**
+ * @swagger
+ * /dislike/{id}:
+ *   put:
+ *     summary: Like a contribution by id
+ *     description: Only authenticated students can like and only accepted contributions are likable.
+ *     tags:
+ *       - Contributions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the contribution to like
+ *       - in: header
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Contribution liked successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Contribution liked!
+ *       404:
+ *         description: Contribution not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Contribution not found!
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 router.put("/dislike/:id", isAuth(["Student"]), async (req, res) => {
 	try {
 		const doc = await ContributionModel.findOne({
@@ -497,8 +726,62 @@ router.put("/dislike/:id", isAuth(["Student"]), async (req, res) => {
 	}
 });
 
-// * Un-dislike contribution.
+// * Un-dislike contribution. ✅
 // - Only the students can dislike the accepted contributions.
+/**
+ * @swagger
+ * /undislike/{id}:
+ *   put:
+ *     summary: Like a contribution by id
+ *     description: Only authenticated students can like and only accepted contributions are likable.
+ *     tags:
+ *       - Contributions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the contribution to like
+ *       - in: header
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Token for authentication
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Contribution liked successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Contribution liked!
+ *       404:
+ *         description: Contribution not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Contribution not found!
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
 router.put("/undislike/:id", isAuth(["Student"]), async (req, res) => {
 	try {
 		const doc = await ContributionModel.findOne({
@@ -523,7 +806,7 @@ router.put("/undislike/:id", isAuth(["Student"]), async (req, res) => {
 	}
 });
 
-// * Download contributions
+// * Download contributions ✅
 // Only marketing manger can download upload contributions in a event no matter if they are accepted or not
 router.get("/download/:id", isAuth(["Marketing Manager"]), async (req, res) => {
 	try {
