@@ -4,7 +4,11 @@ const { isAuth } = require("../middlewares/auth");
 var express = require("express");
 var router = express.Router();
 const EventModel = require("../models/EventModel");
-
+const ContributionModel = require('../models/ContributionModel');
+const fs = require('fs');
+const archiver = require('archiver');
+const path = require('path');
+const { contributionBasePath } = require("../utilities/constants");
 // * GET events listing.
 
 
@@ -83,6 +87,54 @@ router.delete(
     }
   );
 
-router.get("/", isAuth(["Student"]))
+  router.get("/download/:id",isAuth(["Admin"]), async (req, res) => {
+    try {
+      const docs = await ContributionModel.find({
+        event: req.params.id,
+      }).populate("event");
+      if (!docs) {
+        return res.status(404).json({
+          message: "Contributions of this event not found!",
+        });
+      }
+  
+      const folderPath = `${contributionBasePath}/${req.params.id}`;
+      // Create a zip file
+      const zipPath = `./public/downloads/${docs[0].event.name}.zip`;
+      const output = fs.createWriteStream(zipPath);
+      const archive = archiver("zip", {
+        zlib: { level: 9 },
+      });
+      archive.pipe(output);
+  
+      // Add all files in the folder to the zip
+      const contributionFolders = fs.readdirSync(folderPath);
+      contributionFolders.forEach((folder) => {
+        const files = fs.readdirSync(path.join(folderPath, folder));
+        files.forEach((file) => {
+          const filePath = path.join(folderPath, folder, file);
+          archive.file(filePath, { name: path.join(folder, file) });
+        });
+      });
+  
+      // Finalize the zip file
+      archive.finalize();
+  
+      // Send the zip file as a response
+      output.on("close", () => {
+        res.download(zipPath, (err) => {
+          if (err) {
+            res.status(500).json({ error: error.message });
+          } else {
+            // Delete the file after sending it
+            fs.unlinkSync(zipPath);
+          }
+        });
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: error.message });
+    }
+  });
 
 module.exports = router;
