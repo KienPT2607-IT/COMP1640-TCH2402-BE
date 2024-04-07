@@ -8,9 +8,9 @@ const EventModel = require("../models/EventModel");
 // * GET events listing.
 
 
-router.get("/", isAuth(["Admin"]), async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    const events = await EventModel.find({});
+    const events = await EventModel.find({}).populate('create_by', 'full_name');
     if (events.length === 0) {
       return res.status(404).json({ message: "No events found" });
     }

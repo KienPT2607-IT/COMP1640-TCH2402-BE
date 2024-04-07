@@ -12,22 +12,22 @@ var EventSchema = Schema({
 	},
 	due_date: {
         type: Date,
-        required: [true, 'Ngày kết thúc sự kiện là bắt buộc.'],
+        required: true,
         validate: {
             validator: function(value) {
                 return value > this.create_date;
             },
-            message: 'Ngày kết thúc sự kiện phải sau ngày tạo sự kiện.'
+            message: 'The event end date must be after the event creation date.'
         }
     },
     closure_date: {
         type: Date,
-        required: [true, 'Ngày đóng sự kiện là bắt buộc.'],
+        required: true,
         validate: {
             validator: function(value) {
                 return value > this.due_date;
             },
-            message: 'Ngày đóng sự kiện phải sau ngày kết thúc sự kiện.'
+            message: 'The event close date must be after the event end date.'
         }
     },
 	is_enable: {
