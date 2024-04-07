@@ -13,6 +13,7 @@ const tokenSecret = process.env.TOKEN_SECRET_KEY;
 const saltRounds = 8;
 const nodemailer = require("nodemailer");
 const { getUploadMiddleware } = require("../middlewares/upload");
+const path = require("path");
 
 // * GET users listing. ✅
 /**
@@ -46,14 +47,29 @@ const { getUploadMiddleware } = require("../middlewares/upload");
  */
 router.get("/", isAuth(["Admin"]), async (req, res) => {
 	try {
-		let users = await UserModel.find();
+		let users = await UserModel.find().populate("faculty").populate("role");
 		if (users.length <= 0) {
 			res.status(400).json({
 				message: "No users found!",
 			});
 		}
+
+		let users_data = users.map((each) => {
+			let user = each.toObject();
+			if (user.faculty) user.faculty = user.faculty.name;
+			if (user.profile_picture) {
+				const imageUrl = path.join(
+					process.env.HOST_URL,
+					"public/profile_pictures",
+					user.profile_picture
+				);
+				user.profile_picture = imageUrl;
+			}
+			user.role = user.role.name;
+			return user;
+		});
 		res.status(200).json({
-			data: users,
+			data: users_data,
 		});
 	} catch (error) {
 		res.status(404).json({
@@ -105,22 +121,31 @@ router.post("/login", async (req, res) => {
 			.select("+password")
 			.populate("faculty")
 			.populate("role"); // "+" = allow select hidden field
-		if (!user) {
+		if (!user)
 			return res.status(400).json({
 				message: "User with this email does not exist!",
 			});
-		}
 
 		const isPassMatch = await bcrypt.compare(password, user.password);
-		if (!isPassMatch) {
+		if (!isPassMatch)
 			return res.status(400).json({
 				message: "Incorrect password!",
 			});
+
+		user = user.toObject();
+		if (user.faculty) user.faculty = user.faculty.name;
+		if (user.profile_picture) {
+			const imageUrl = path.join(
+				process.env.HOST_URL,
+				"public/profile_pictures",
+				user.profile_picture
+			);
+			user.profile_picture = imageUrl;
 		}
-		const token = jwt.sign(
-			{ _id: user._id, role: user.role.name },
-			tokenSecret
-		);
+
+		user.role = user.role.name;
+		const token = jwt.sign({ _id: user._id, role: user.role }, tokenSecret);
+		delete user._id;
 		res.status(200).json({
 			token: token,
 			data: user,
@@ -248,51 +273,54 @@ router.get("/update/:id", async (req, res) => {
 	}
 });
 
-router.put("/update/:id", getUploadMiddleware('profile_pictures', 'profile_picture'), async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { email, password, phone_number } = req.body;
-        const { fileName } = req; // Multer middleware sets `fileName` property in request object
+router.put(
+	"/update/:id",
+	getUploadMiddleware("profile_pictures", "profile_picture"),
+	async (req, res) => {
+		try {
+			const { id } = req.params;
+			const { email, password, phone_number } = req.body;
+			const { fileName } = req; // Multer middleware sets `fileName` property in request object
 
-        // Kiểm tra xem người dùng có tồn tại trong cơ sở dữ liệu không
-        const user = await UserModel.findById(id);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
+			// Kiểm tra xem người dùng có tồn tại trong cơ sở dữ liệu không
+			const user = await UserModel.findById(id);
+			if (!user) {
+				return res.status(404).json({ message: "User not found" });
+			}
 
-        if (email) {
-            user.email = email;
-        }
-        // Nếu có trường password được cung cấp, mã hóa mật khẩu mới và cập nhật vào user
-        if (password) {
-            const hashedPassword = await bcrypt.hash(password, saltRounds);
-            user.password = hashedPassword;
-        }
+			if (email) {
+				user.email = email;
+			}
+			// Nếu có trường password được cung cấp, mã hóa mật khẩu mới và cập nhật vào user
+			if (password) {
+				const hashedPassword = await bcrypt.hash(password, saltRounds);
+				user.password = hashedPassword;
+			}
 
-        // Cập nhật phone number nếu được cung cấp
-        if (phone_number) {
-            user.phone_number = phone_number;
-        }
+			// Cập nhật phone number nếu được cung cấp
+			if (phone_number) {
+				user.phone_number = phone_number;
+			}
 
-        // Cập nhật profile picture nếu được tải lên
-        if (fileName) {
-            user.profile_picture = fileName;
-        }
+			// Cập nhật profile picture nếu được tải lên
+			if (fileName) {
+				user.profile_picture = fileName;
+			}
 
-        // Lưu thông tin người dùng đã cập nhật vào cơ sở dữ liệu
-        const updatedUser = await user.save();
+			// Lưu thông tin người dùng đã cập nhật vào cơ sở dữ liệu
+			const updatedUser = await user.save();
 
-        // Trả về phản hồi thành công với thông tin người dùng đã cập nhật
-        res.status(200).json({
-            message: "User updated successfully",
-            data: updatedUser,
-        });
-    } catch (error) {
-        console.error("Error:", error);
-        res.status(500).json({ message: "Internal Server Error" });
-    }
-});
-
+			// Trả về phản hồi thành công với thông tin người dùng đã cập nhật
+			res.status(200).json({
+				message: "User updated successfully",
+				data: updatedUser,
+			});
+		} catch (error) {
+			console.error("Error:", error);
+			res.status(500).json({ message: "Internal Server Error" });
+		}
+	}
+);
 
 //----------------------------Forgot-password------------------------------
 

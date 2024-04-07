@@ -11,24 +11,8 @@ module.exports = {
 			profile_picture: { type: "string" },
 			registration_date: { type: "string", format: "date" },
 			account_status: { type: "boolean" },
-			faculty: {
-				type: "object",
-				properties: {
-					_id: { type: "string", format: "uuid" },
-					name: { type: "string" },
-					created_by: { type: "string", format: "uuid" },
-					created_date: { type: "string", format: "date-time" },
-					status: { type: "boolean" },
-				},
-			},
-			role: {
-				type: "object",
-				properties: {
-					_id: { type: "string", format: "uuid" },
-					name: { type: "string" },
-					status: { type: "boolean" },
-				},
-			},
+			faculty: { type: "string" },
+			role: { type: "string" },
 		},
 	},
 	UserArray: {
