@@ -12,9 +12,9 @@ const { contributionBasePath } = require("../utilities/constants");
 // * GET events listing.
 
 
-router.get("/", async (req, res) => {
+router.get("/",isAuth(["Student", "Admin"]), async (req, res) => {
   try {
-    const events = await EventModel.find({}).populate('create_by', 'full_name');
+    const events = await EventModel.find().populate('create_by');
     if (events.length === 0) {
       return res.status(404).json({ message: "No events found" });
     }
@@ -48,6 +48,31 @@ router.post("/createEvent", isAuth(["Admin"]), async (req, res) => {
         res.status(500).json({ message: "Lỗi server" });
     }
 });
+
+router.get("/detail/:id",isAuth(["Student", "Admin"]), async (req, res) => {
+  try {
+      const eventId = req.params.id;
+
+      // Tìm kiếm sự kiện dựa trên ID
+      const event = await EventModel.findById(eventId);
+      if (!event) {
+          return res.status(404).json({ message: "Sự kiện không tồn tại" });
+      }
+
+      // Tìm tất cả các đóng góp của sự kiện đó
+      const contributions = await ContributionModel.find({ event: eventId });
+
+      // Trả về thông tin chi tiết của sự kiện kèm theo tất cả các đóng góp của nó
+      res.status(200).json({
+          event: event,
+          contributions: contributions
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Lỗi server" });
+  }
+});
+
 // * GET event by id.
 router.get(
     "/updateEvent/:id", isAuth(["Admin"]),
