@@ -264,49 +264,50 @@ router.post("/create-user", isAuth(["Admin"]), async (req, res) => {
 });
 
 // --------------------------Update Student info-------------------------
-router.get("/update/:id", async (req, res) => {
-	const user = await UserModel.findById(req.params.id);
-	if (user) {
-		res.send(user);
-	} else {
-		res.status(404).send({ message: "User Not Found" });
-	}
+router.get("/update", isAuth(["Student", "Marketing Manager","Marketing Coordinator", "Student","Admin"]), async (req, res) => {
+    try {
+        const userId = req._id; // Lấy userId từ thông tin được đặt vào req bởi middleware isAuth
+        const user = await UserModel.findById(userId);
+        if (user) {
+            res.send(user);
+        } else {
+            res.status(404).send({ message: "User Not Found" });
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
 });
 
 router.put(
-    "/update/:id",
+    "/update", isAuth(["Student", "Marketing Manager","Marketing Coordinator", "Student","Admin"]),
     getUploadMiddleware("profile_pictures", "profile_picture"),
     async (req, res) => {
         try {
-            const { id } = req.params;
+            const userId = req._id; // Lấy userId từ thông tin được đặt vào req bởi middleware isAuth
             const { password, phone_number } = req.body;
-			const fileName = req.file.filename; // Sử dụng req.file.filename để lấy tên file tải lên
+            const fileName = req.file.filename;
 
-            // Kiểm tra xem người dùng có tồn tại trong cơ sở dữ liệu không
-            const user = await UserModel.findById(id);
+            const user = await UserModel.findById(userId);
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }
-            // Nếu có trường password được cung cấp, mã hóa mật khẩu mới và cập nhật vào user
+
             if (password) {
                 const hashedPassword = await bcrypt.hash(password, saltRounds);
                 user.password = hashedPassword;
             }
 
-            // Cập nhật phone number nếu được cung cấp
             if (phone_number) {
                 user.phone_number = phone_number;
             }
 
-            // Cập nhật profile picture nếu được tải lên
             if (fileName) {
                 user.profile_picture = fileName;
             }
 
-            // Lưu thông tin người dùng đã cập nhật vào cơ sở dữ liệu
             const updatedUser = await user.save();
 
-            // Trả về phản hồi thành công với thông tin người dùng đã cập nhật
             res.status(200).json({
                 message: "User updated successfully",
                 data: updatedUser,
@@ -317,6 +318,7 @@ router.put(
         }
     }
 );
+
 
 
 
