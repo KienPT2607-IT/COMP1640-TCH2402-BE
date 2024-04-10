@@ -137,7 +137,7 @@ router.post("/login", async (req, res) => {
 		if (user.profile_picture) {
 			const imageUrl = path.join(
 				process.env.HOST_URL,
-				"public/profile_pictures",
+				"public/uploads/profile_pictures",
 				user.profile_picture
 			);
 			user.profile_picture = imageUrl;
