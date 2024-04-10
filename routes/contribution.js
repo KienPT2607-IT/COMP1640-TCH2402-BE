@@ -81,7 +81,7 @@ router.post(
 // - Only the accepted contributions will be shown.
 /**
  * @swagger
- * /event/{id}:
+ * /events/{id}:
  *   get:
  *     summary: Retrieve the accepted contributions for a specific event
  *     tags: [Contributions]
@@ -116,7 +116,7 @@ router.post(
  *         description: No contributions found
  */
 router.get(
-	"/:id",
+	"/event/:id",
 	isAuth(["Marketing Manager", "Marketing Coordinator", "Student"]),
 	async (req, res) => {
 		try {
