@@ -1,7 +1,10 @@
+require("dotenv").config();
+
 var express = require("express");
 const ContributionModel = require("../models/ContributionModel");
 const { isAuth } = require("../middlewares/auth");
 const { getUploadMiddleware, removeFiles } = require("../middlewares/upload");
+const { processContribution } = require("../utilities/process_contribution");
 const fs = require("fs");
 const archiver = require("archiver");
 const path = require("path");
@@ -123,20 +126,22 @@ router.get(
 			let contributions = await ContributionModel.find({
 				event: req.params.id,
 				is_accepted: true,
-			});
+			}).populate("contributor");
 
-			if (contributions.length === 0) {
-				res.status(400).json({
+			if (contributions.length === 0)
+				return res.status(400).json({
 					message: "No contributions found!",
 				});
-			}
+
+			let results = contributions.map((each) => {
+				let contribution = processContribution(each);
+				return contribution;
+			});
 			res.status(200).json({
-				data: contributions,
+				data: results,
 			});
 		} catch (error) {
-			res.status(404).json({
-				error: error.message,
-			});
+			res.status(500).json({ error: error.message });
 		}
 	}
 );
@@ -145,7 +150,7 @@ router.get(
 // - Only the request contributions will be shown.
 /**
  * @swagger
- * /view/requests:
+ * /requests:
  *   get:
  *     summary: Retrieve the requested contributions
  *     tags: [Contributions]
@@ -175,29 +180,33 @@ router.get(
  *       500:
  *         description: Some server error
  */
-router.get(
-	"/view/requests",
-	isAuth(["Marketing Coordinator"]),
-	async (req, res) => {
-		try {
-			let contributions = await ContributionModel.find({
-				is_accepted: false,
-			}).populate({ path: "event", match: { create_by: req._id } });
-			if (contributions.length <= 0) {
-				return res.status(400).json({
-					message: "No contributions found!",
-				});
-			}
-			res.status(200).json({
-				data: contributions,
+router.get("/requests", isAuth(["Marketing Coordinator"]), async (req, res) => {
+	try {
+		let contributions = await ContributionModel.find({
+			is_accepted: false,
+		})
+			.populate("contributor")
+			.populate({ path: "event", match: { create_by: req._id } })
+			.then((contributions) => {
+				// Filter out contributions with null 'event' field
+				return contributions.filter(
+					(contribution) => contribution.event !== null
+				);
 			});
-		} catch (error) {
-			res.status(500).json({
-				error: error.message,
-			});
-		}
+		if (contributions.length <= 0)
+			return res.status(404).json({ message: "No contributions found!" });
+
+		let results = contributions.map((each) => {
+			let contribution = processContribution(each);
+			contribution.event_name = contribution.event.name;
+			delete contribution.event;
+			return contribution;
+		});
+		res.status(200).json({ data: results });
+	} catch (error) {
+		res.status(500).json({ error: error.message });
 	}
-);
+});
 
 // * Accept contribution by id ✅
 // - Only the event creator can accept the contributions.
