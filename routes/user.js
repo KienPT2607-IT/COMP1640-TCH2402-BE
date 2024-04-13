@@ -14,6 +14,7 @@ const saltRounds = 8;
 const nodemailer = require("nodemailer");
 const { getUploadMiddleware } = require("../middlewares/upload");
 const path = require("path");
+const fs = require('fs');
 
 // * GET users listing. ✅
 /**
@@ -263,24 +264,92 @@ router.post("/create-user", isAuth(["Admin"]), async (req, res) => {
 	}
 });
 
-// --------------------------Update Student info-------------------------
-router.get("/update", isAuth(["Student", "Marketing Manager","Marketing Coordinator", "Student","Admin"]), async (req, res) => {
+
+// Route to serve user profile and avatar
+router.get('/profile', isAuth(["Student", "Marketing Manager","Marketing Coordinator", "Guest","Admin"]), async (req, res) => {
     try {
         const userId = req._id; // Lấy userId từ thông tin được đặt vào req bởi middleware isAuth
         const user = await UserModel.findById(userId);
-        if (user) {
-            res.send(user);
-        } else {
-            res.status(404).send({ message: "User Not Found" });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
         }
+
+        // Lấy thông tin về ảnh đại diện của người dùng
+        const profilePicture = user.profile_picture;
+        // Đường dẫn đến thư mục chứa ảnh đại diện trên máy chủ
+        const imagePath = path.join(__dirname, 'public/uploads/profile_pictures', profilePicture);
+
+        // Kiểm tra xem tệp tin có tồn tại không
+        // if (!fs.existsSync(imagePath)) {
+        //     return res.status(404).json({ message: 'Profile picture not found' });
+        // }
+		const role = await RoleModel.findById(user.role);
+        const faculty = await FacultyModel.findById(user.faculty);
+
+        // Kết hợp thông tin người dùng và đường dẫn ảnh đại diện trong phản hồi JSON
+        const userProfile = {
+            _id: user._id,
+            full_name: user.full_name,
+            email: user.email,
+			role: role ? role.name : 'Unknown Role', // Sử dụng tên của vai trò nếu có, nếu không thì sử dụng giá trị mặc định 'Unknown Role'
+            faculty: faculty ? faculty.name : 'Unknown Faculty', // Sử dụng tên của khoa nếu có, nếu không thì sử dụng giá trị mặc định 'Unknown Faculty'
+			dob: user.dob,
+            phone_number: user.phone_number,
+			registration_date: user.registration_date,
+			account_status: user.account_status,
+            profile_picture: `https://comp1640-tch2402-be.onrender.com/public/uploads/profile_pictures/${profilePicture}`
+            // Thêm các trường thông tin khác của người dùng nếu cần
+        };
+		console.log(userProfile);
+        // Gửi phản hồi JSON chứa thông tin người dùng và đường dẫn ảnh đại diện
+        res.status(200).json(userProfile);
     } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
 
+
+
+// // --------------------------Update Student info-------------------------
+// router.get("/update", isAuth(["Student", "Marketing Manager","Marketing Coordinator", "Student","Admin"]), async (req, res) => {
+//     try {
+//         const userId = req._id; // Lấy userId từ thông tin được đặt vào req bởi middleware isAuth
+// 		 const user = await UserModel.findById(userId);
+// 		 // Lấy thông tin về ảnh đại diện của người dùng
+// 		 const profilePicture = user.profile_picture;
+// 		 // Đường dẫn đến thư mục chứa ảnh đại diện trên máy chủ
+// 		 const imagePath = path.join(__dirname, 'public/uploads/profile_pictures', profilePicture);
+ 
+// 		 // Kiểm tra xem tệp tin có tồn tại không
+// 		//  if (!fs.existsSync(imagePath)) {
+// 		// 	 res.status(404).json({ message: 'Profile picture not found' });
+// 		//  }
+//         const userProfile = {
+//             _id: user._id,
+//             full_name: user.full_name,
+//             email: user.email,
+// 			faculty: user.faculty,
+// 			role:  user.role,
+// 			dob: user.dob,
+//             phone_number: user.phone_number,
+//             profile_picture: `http://localhost:3000/uploads/profile_pictures/${profilePicture}`
+//             // Thêm các trường thông tin khác của người dùng nếu cần
+//         };
+//         if (userProfile) {
+//             res.send(userProfile);
+//         } else {
+//             res.status(404).send({ message: "User Not Found" });
+//         }
+//     } catch (error) {
+//         console.error("Error:", error);
+//         res.status(500).json({ message: "Internal Server Error" });
+//     }
+// });
+
 router.put(
-    "/update", isAuth(["Student", "Marketing Manager","Marketing Coordinator", "Student","Admin"]),
+    "/update", isAuth(["Student", "Marketing Manager","Marketing Coordinator", "Guest","Admin"]),
     getUploadMiddleware("profile_pictures", "profile_picture"),
     async (req, res) => {
         try {
@@ -383,7 +452,7 @@ async function sendResetEmail(email, resetToken) {
 }
 
 //--------------------------Delete account-------------------------
-router.delete("/:id", async (req, res) => {
+router.delete("/:id",isAuth(["Admin"]), async (req, res) => {
 	try {
 		const userId = req.params.id;
 

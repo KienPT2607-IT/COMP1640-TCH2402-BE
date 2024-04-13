@@ -33,7 +33,7 @@ router.post("/create", isAuth(["Student"]), async (req, res) => {
 });
 
 // Hiển thị tất cả các comment cho mỗi contribution
-router.get("/:contributionId", async (req, res) => {
+router.get("/:contributionId",isAuth(["Student", "Admin"]), async (req, res) => {
     try {
       const { contributionId } = req.params;
   
@@ -95,6 +95,11 @@ router.put('/like/:commentId', isAuth(["Student"]), async (req, res) => {
     }
   });
   
-
+  router.delete('/delete/:id', isAuth(["Student"]), async(req, res)=>{
+    const comment = CommentModel.findById(req.params.id);
+    if (!comment) return res.status(404).send("Comment not found");
+    await CommentModel.remove(req.params.id);
+    res.send(comment);
+  })
 
 module.exports = router;
