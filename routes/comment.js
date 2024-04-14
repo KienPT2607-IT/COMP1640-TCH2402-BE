@@ -45,7 +45,7 @@ router.get("/:contributionId",isAuth(["Student", "Admin"]), async (req, res) => 
   
       // Lấy tất cả các comment cho contributionId được cung cấp
       const comments = await CommentModel.find({ contribution: contributionId })
-        .populate("commenter", "username email") // Lấy thông tin commenter từ UserModel
+        .populate("commenter") // Lấy thông tin commenter từ UserModel
         .exec();
   
       res.status(200).json(comments);

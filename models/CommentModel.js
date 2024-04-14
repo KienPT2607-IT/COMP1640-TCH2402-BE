@@ -13,10 +13,12 @@ var CommentSchema = Schema({
 	like_count: {
 		type: Number,
 		min: 0,
+		default: 0,
 	},
 	dislike_count: {
 		type: Number,
 		min: 0,
+		default: 0,
 	},
 	contribution: {
 		type: SchemaTypes.ObjectId,
