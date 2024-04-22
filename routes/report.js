@@ -16,12 +16,11 @@ router.get("/", isAuth(["Marketing Manager", "Guest"]), async (req, res) => {
 		return res.status(200).json({
 			user_count: users.length,
 			contribution_count: contributions.length,
-			top_liked_contributions: topDislikedContributions,
+			top_liked_contributions: topLikedContributions,
 			top_disliked_contributions: topDislikedContributions,
 			top_events: topEvents,
 		});
 	} catch (error) {
-		console.log(error);
 		return res.status(500).send();
 	}
 });
