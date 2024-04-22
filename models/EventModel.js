@@ -40,6 +40,11 @@ var EventSchema = Schema({
 		ref: "users",
 		required: true,
 	},
+	faculty: {
+		type: SchemaTypes.ObjectId,
+		ref: "faculties",
+		required: true,
+	},
 	description: String,
 });
 

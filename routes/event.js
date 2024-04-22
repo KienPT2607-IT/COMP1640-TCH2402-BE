@@ -30,24 +30,37 @@ router.get("/",isAuth(["Student", "Admin", "Marketing Manager","Marketing Coordi
 
 // * POST create event.
 router.post("/createEvent", isAuth(["Admin"]), async (req, res) => {
-    try {
-        // Tạo một instance mới của EventModel với toàn bộ thông tin từ req.body
-        const event = new EventModel(req.body);
-
-        // Gán create_by là _id từ token xác thực
-        event.create_by = req._id;
-
-        // Lưu sự kiện vào cơ sở dữ liệu
-        await event.save();
-
-        // Trả về kết quả thành công và sự kiện đã được tạo
-        res.status(201).json(event);
-    } catch (err) {
-        // Xử lý lỗi nếu có
-        console.error(err);
-        res.status(500).json({ message: "Lỗi server" });
-    }
+  try {
+      // Lấy thông tin từ body của request
+      const {
+          name,
+          due_date,
+          closure_date,
+          faculty,
+          description
+      } = req.body;
+      // Lấy _id của người tạo sự kiện từ req._id
+      const create_by = req._id;
+      // Tạo một instance mới của EventModel
+      const newEvent = new EventModel({
+          name,
+          due_date,
+          closure_date,
+          faculty,
+          create_by,
+          description
+      });
+      // Lưu sự kiện vào cơ sở dữ liệu
+      await newEvent.save();
+      // Trả về kết quả thành công và sự kiện đã được tạo
+      res.status(201).json(newEvent);
+  } catch (err) {
+      // Xử lý lỗi nếu có
+      console.error(err);
+      res.status(500).json({ message: "Lỗi server" });
+  }
 });
+
 
 router.get("/detail/:id",isAuth(["Student", "Admin"]), async (req, res) => {
   try {
