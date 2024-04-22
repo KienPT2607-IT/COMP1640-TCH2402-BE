@@ -15,6 +15,7 @@ var facultiesRouter = require("./routes/faculty");
 var eventsRouter = require("./routes/event");
 var contributionsRouter = require("./routes/contribution");
 var commentsRouter = require("./routes/comment");
+var reportRouter = require("./routes/report");
 
 var mongoose = require("mongoose");
 var cors = require("cors");
@@ -60,5 +61,6 @@ app.use("/faculties", facultiesRouter);
 app.use("/events", eventsRouter);
 app.use("/contributions", contributionsRouter);
 app.use("/comments", commentsRouter);
+app.use("/reports", reportRouter);
 
 module.exports = app;
