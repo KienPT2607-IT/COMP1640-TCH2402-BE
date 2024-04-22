@@ -24,11 +24,6 @@ var ContributionSchema = Schema({
 		required: true,
 		default: Date.now,
 	},
-	is_accepted: {
-		required: true,
-		type: Boolean,
-		default: false,
-	},
 	contributor: {
 		type: SchemaTypes.ObjectId,
 		ref: "users",
