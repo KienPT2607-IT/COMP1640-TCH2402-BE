@@ -12,7 +12,7 @@ const { contributionBasePath } = require("../utilities/constants");
 // * GET events listing.
 
 
-router.get("/",isAuth(["Student", "Admin"]), async (req, res) => {
+router.get("/",isAuth(["Student", "Admin", "Marketing Manager","Marketing Coordinator"]), async (req, res) => {
   try {
     const events = await EventModel.find().populate('create_by');
     if (events.length === 0) {
@@ -111,6 +111,27 @@ router.delete(
       res.send(event);
     }
   );
+
+  // * POST search event by name.
+router.post("/searchByName", isAuth(["Student", "Admin"]), async (req, res) => {
+  try {
+    const eventName = req.body.name;
+
+    // Tìm kiếm sự kiện dựa trên tên
+    const events = await EventModel.find({ name: { $regex: new RegExp(eventName, "i") } }).populate('create_by');
+    
+    if (events.length === 0) {
+      return res.status(404).json({ message: "No events found with that name" });
+    }
+
+    res.status(200).json({
+      data: events
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
   router.get("/download/:id",isAuth(["Admin"]), async (req, res) => {
     try {

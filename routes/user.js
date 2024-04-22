@@ -395,14 +395,12 @@ router.put(
 
 // Phần cấu hình transporter
 const transporter = nodemailer.createTransport({
-	host: "smtp.gmail.com", // Địa chỉ SMTP server
-	port: 587, // Cổng SMTP
-	secure: false, // Nếu sử dụng SSL/TLS, đặt giá trị là true
+	service: "gmail",
 	auth: {
-		user: "your email",
-		pass: "pw app",
+	  user: process.env.EMAIL_USER,
+	  pass: process.env.EMAIL_PASS,
 	},
-});
+  });
 // POST forgot password
 router.post("/forgot-password", async (req, res) => {
 	try {
@@ -437,7 +435,7 @@ router.post("/forgot-password", async (req, res) => {
 });
 async function sendResetEmail(email, resetToken) {
 	const mailOptions = {
-		from: "your email",
+		from: "dvcinema87@gmail.com",
 		to: email,
 		subject: "Password Reset",
 		text: `The new password is: ${resetToken}`,

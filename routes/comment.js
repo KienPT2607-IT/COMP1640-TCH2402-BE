@@ -3,7 +3,39 @@ const router = express.Router();
 const CommentModel = require("../models/CommentModel");
 const ContributionModel = require("../models/ContributionModel");
 const { isAuth } = require("../middlewares/auth");
+require("dotenv").config();
+const UserModel = require("../models/UserModel")
+const nodemailer = require("nodemailer");
 
+const emailUser = process.env.EMAIL_USER;
+const emailPass = process.env.EMAIL_PASS;
+
+// Tạo một transporter để gửi email
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: emailUser,
+        pass: emailPass
+    }
+});
+
+async function sendCommentNotification(contributionCreatorEmail, contributionId) {
+  try {
+      // Tạo nội dung email
+      let mailOptions = {
+          from: emailUser,
+          to: contributionCreatorEmail,
+          subject: 'New Comment on Your Contribution',
+          text: `Someone commented on your contribution with ID: ${contributionId}. Check it out!`
+      };
+
+      // Gửi email
+      let info = await transporter.sendMail(mailOptions);
+      console.log('Email sent: ', info.response);
+  } catch (error) {
+      console.error('Error sending email: ', error);
+  }
+}
 // Create a new comment
 router.post("/create", isAuth(["Student"]), async (req, res) => {
   try {
@@ -25,7 +57,14 @@ router.post("/create", isAuth(["Student"]), async (req, res) => {
     });
 
     const savedComment = await newComment.save();
-    res.status(201).json(savedComment);
+
+    // Lấy email của người tạo đóng góp
+    const contributionCreator = await UserModel.findById(contributionExists.contributor);
+    const contributionCreatorEmail = contributionCreator.email;
+
+ // Gửi email thông báo
+    sendCommentNotification(contributionCreatorEmail, contribution);
+ res.status(201).json(savedComment);
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -96,10 +135,15 @@ router.put('/like/:commentId', isAuth(["Student"]), async (req, res) => {
   });
   
   router.delete('/delete/:id', isAuth(["Student"]), async(req, res)=>{
-    const comment = CommentModel.findById(req.params.id);
-    if (!comment) return res.status(404).send("Comment not found");
-    await CommentModel.remove(req.params.id);
-    res.send(comment);
-  })
+    try {
+      const comment = await CommentModel.findByIdAndDelete(req.params.id);
+      if (!comment) return res.status(404).send("Comment not found");
+      res.send(comment);
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+  
 
 module.exports = router;
