@@ -276,14 +276,15 @@ router.get('/profile', isAuth(["Student", "Marketing Manager","Marketing Coordin
         }
 
         // Lấy thông tin về ảnh đại diện của người dùng
-        const profilePicture = user.profile_picture;
-        // Đường dẫn đến thư mục chứa ảnh đại diện trên máy chủ
-        const imagePath = path.join(__dirname, 'public/uploads/profile_pictures', profilePicture);
+		let profilePicture = user.profile_picture;
+        let imageUrl;
 
-        // Kiểm tra xem tệp tin có tồn tại không
-        // if (!fs.existsSync(imagePath)) {
-        //     return res.status(404).json({ message: 'Profile picture not found' });
-        // }
+        if (profilePicture) {
+            imageUrl = `https://comp1640-tch2402-be.onrender.com/public/uploads/profile_pictures/${profilePicture}`;
+        } else {
+            // Đường dẫn đến ảnh mặc định
+            imageUrl = `https://ps.w.org/user-avatar-reloaded/assets/icon-256x256.png?rev=2540745`;
+        }
 		const role = await RoleModel.findById(user.role);
         const faculty = await FacultyModel.findById(user.faculty);
 
@@ -298,7 +299,7 @@ router.get('/profile', isAuth(["Student", "Marketing Manager","Marketing Coordin
             phone_number: user.phone_number,
 			registration_date: user.registration_date,
 			account_status: user.account_status,
-            profile_picture: `https://comp1640-tch2402-be.onrender.com/public/uploads/profile_pictures/${profilePicture}`
+            profile_picture: imageUrl
             // Thêm các trường thông tin khác của người dùng nếu cần
         };
 		console.log(userProfile);
