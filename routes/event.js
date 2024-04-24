@@ -1,8 +1,8 @@
 require("dotenv").config();
 const { isAuth } = require("../middlewares/auth");
-
 var express = require("express");
 var router = express.Router();
+const FacultyModel = require("../models/FacultyModel");
 const EventModel = require("../models/EventModel");
 const ContributionModel = require('../models/ContributionModel');
 const fs = require('fs');
@@ -41,19 +41,22 @@ router.post("/createEvent", isAuth(["Admin"]), async (req, res) => {
       } = req.body;
       // Lấy _id của người tạo sự kiện từ req._id
       const create_by = req._id;
-      // Tạo một instance mới của EventModel
-      const newEvent = new EventModel({
-          name,
-          due_date,
-          closure_date,
-          faculty,
-          create_by,
-          description
+      const _faculty = await FacultyModel.findOne({ name: faculty });
+      if (!_faculty)
+			return res.status(400).json({
+				message: "Faculty not found!",
+			});
+      await UserModel.create({
+        name: name,
+        due_date: due_date,
+        closure_date: closure_date,
+        create_by: create_by,
+        description: description,
+        faculty: _faculty._id,
       });
-      // Lưu sự kiện vào cơ sở dữ liệu
-      await newEvent.save();
-      // Trả về kết quả thành công và sự kiện đã được tạo
-      res.status(201).json(newEvent);
+      res.status(201).json({
+        message: "Event added successfully!",
+      });
   } catch (err) {
       // Xử lý lỗi nếu có
       console.error(err);
