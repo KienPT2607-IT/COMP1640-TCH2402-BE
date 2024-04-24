@@ -46,7 +46,7 @@ router.post("/createEvent", isAuth(["Admin"]), async (req, res) => {
 			return res.status(400).json({
 				message: "Faculty not found!",
 			});
-      await UserModel.create({
+      await EventModel.create({
         name: name,
         due_date: due_date,
         closure_date: closure_date,
