@@ -2,6 +2,7 @@ require("dotenv").config();
 
 var express = require("express");
 const ContributionModel = require("../models/ContributionModel");
+const CommentModel = require("../models/CommentModel")
 const { isAuth } = require("../middlewares/auth");
 const { getUploadMiddleware, removeFiles } = require("../middlewares/upload");
 const { processContribution } = require("../utilities/process_contribution");
@@ -309,8 +310,9 @@ router.delete(
 			}
 
 			if (
-				req.role == "Student" &&
-				doc.contributor._id.toString() != req._id
+				(req.role == "Student" &&
+					doc.contributor._id.toString() != req._id) ||
+				req.role != "Marketing Coordinator"
 			) {
 				return res.status(401).json({
 					message:
@@ -318,6 +320,7 @@ router.delete(
 				});
 			}
 			removeFiles(doc.uploads, `${doc.event._id}/${doc.contributor._id}`);
+			await CommentModel.deleteMany({commenter: doc.contributor});
 			await ContributionModel.findByIdAndDelete(req.params.id);
 			res.status(200).json({
 				message: "Contribution deleted!",
