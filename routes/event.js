@@ -14,7 +14,7 @@ const { contributionBasePath } = require("../utilities/constants");
 
 router.get("/",isAuth(["Student", "Admin", "Marketing Manager","Marketing Coordinator"]), async (req, res) => {
   try {
-    const events = await EventModel.find().populate('create_by');
+    const events = await EventModel.find().populate('create_by').populate('faculty');
     if (events.length === 0) {
       return res.status(404).json({ message: "No events found" });
     }
@@ -91,9 +91,9 @@ router.get("/detail/:id",isAuth(["Student", "Admin"]), async (req, res) => {
 
 // * GET event by id.
 router.get(
-    "/updateEvent/:id", isAuth(["Admin"]),
+    "/updateEvent/:eventId", isAuth(["Admin"]),
     async (req, res) => {
-      const event = await EventModel.findById(req.params.id);
+      const event = await EventModel.findById(req.params.eventId);
       if (event) {
         res.send(event);
       } else {
@@ -103,33 +103,57 @@ router.get(
   );
   
 // * PUT update event.
-router.put(
-  "/updateEvent/:id",isAuth(["Admin"]),
-  async (req, res) => {
-    try {
-      const id = req.params.id;
-      const eventData = req.body; // Assuming the updated event data is sent in the request body
-      const updatedEvent = await EventModel.findByIdAndUpdate(id, eventData, { new: true });
-      res.send(updatedEvent);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Error updating event");
-    }
-  }
-);
+router.put("/updateEvent/:eventId", isAuth(["Admin"]), async (req, res) => {
+  try {
+    const eventId = req.params.eventId; // Lấy eventId từ URL
+    const {
+      name,
+      due_date,
+      closure_date,
+      faculty,
+      description
+    } = req.body;
 
-router.delete(
-    "/deleteEvent/:id",isAuth(["Admin"]),
-    async (req, res) => {
-      const event = await EventModel.findById(req.params.id);
-      if (!event) return res.status(404).send("Event not found");
-      await EventModel.remove(req.params.id);
-      res.send(event);
-    }
-  );
+    // Lấy _id của người cập nhật sự kiện từ req._id
+    const updated_by = req._id;
+
+    const _faculty = await FacultyModel.findOne({ name: faculty });
+    if (!_faculty)
+      return res.status(400).json({
+        message: "Faculty not found!",
+      });
+
+    // Kiểm tra sự kiện tồn tại
+    const event = await EventModel.findById(eventId);
+    if (!event)
+      return res.status(400).json({
+        message: "Event not found!",
+      });
+
+    // Cập nhật thông tin sự kiện
+    event.name = name;
+    event.due_date = due_date;
+    event.closure_date = closure_date;
+    event.description = description;
+    event.faculty = _faculty._id;
+    event.create_by = updated_by;
+
+    await event.save();
+
+    res.status(200).json({
+      message: "Event updated successfully!",
+      data: event // Trả về thông tin của sự kiện đã được cập nhật
+    });
+
+  } catch (err) {
+    // Xử lý lỗi nếu có
+    console.error(err);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+});
 
   // * POST search event by name.
-router.post("/searchByName", isAuth(["Student", "Admin"]), async (req, res) => {
+router.post("/searchByName",isAuth(["Student", "Admin", "Marketing Manager","Marketing Coordinator"]), async (req, res) => {
   try {
     const eventName = req.body.name;
 
@@ -149,7 +173,7 @@ router.post("/searchByName", isAuth(["Student", "Admin"]), async (req, res) => {
   }
 });
 
-  router.get("/download/:id",isAuth(["Admin"]), async (req, res) => {
+  router.get("/download/:id",isAuth(["Marketing Manager"]), async (req, res) => {
     try {
       const docs = await ContributionModel.find({
         event: req.params.id,
