@@ -21,6 +21,7 @@ router.get("/", isAuth(["Marketing Manager", "Guest"]), async (req, res) => {
 			top_events: topEvents,
 		});
 	} catch (error) {
+		console.log(error);
 		return res.status(500).send();
 	}
 });
@@ -37,8 +38,10 @@ async function getTopDislikedContributions() {
 		delete doc.like_count;
 		delete doc.content;
 		delete doc.submission_date;
-		doc.event = doc.event.name;
-		doc.contributor = doc.contributor.full_name;
+		doc.event = doc.event ? doc.event.name : "Event not found";
+		doc.contributor = doc.contributor
+			? doc.contributor.full_name
+			: "User not found";
 		return doc;
 	});
 	return topDislikedContributions;
@@ -56,8 +59,10 @@ async function getTopLikeContributions() {
 		delete doc.dislike_count;
 		delete doc.content;
 		delete doc.submission_date;
-		doc.event = doc.event.name;
-		doc.contributor = doc.contributor.full_name;
+		doc.event = doc.event ? doc.event.name : "Event not found";
+		doc.contributor = doc.contributor
+			? doc.contributor.full_name
+			: "User not found";
 		return doc;
 	});
 	return topLikedContributions;
@@ -89,7 +94,6 @@ async function getTopEvents() {
 		doc.contribution_count = each.count;
 		return doc;
 	});
-	console.log(topEvents);
 	return topEvents;
 }
 
