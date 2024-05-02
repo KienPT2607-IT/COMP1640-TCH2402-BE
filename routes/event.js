@@ -103,54 +103,20 @@ router.get(
   );
   
 // * PUT update event.
-router.put("/updateEvent/:eventId", isAuth(["Admin"]), async (req, res) => {
-  try {
-    const eventId = req.params.eventId; // Lấy eventId từ URL
-    const {
-      name,
-      due_date,
-      closure_date,
-      faculty,
-      description
-    } = req.body;
-
-    // Lấy _id của người cập nhật sự kiện từ req._id
-    const updated_by = req._id;
-
-    const _faculty = await FacultyModel.findOne({ name: faculty });
-    if (!_faculty)
-      return res.status(400).json({
-        message: "Faculty not found!",
-      });
-
-    // Kiểm tra sự kiện tồn tại
-    const event = await EventModel.findById(eventId);
-    if (!event)
-      return res.status(400).json({
-        message: "Event not found!",
-      });
-
-    // Cập nhật thông tin sự kiện
-    event.name = name;
-    event.due_date = due_date;
-    event.closure_date = closure_date;
-    event.description = description;
-    event.faculty = _faculty._id;
-    event.create_by = updated_by;
-
-    await event.save();
-
-    res.status(200).json({
-      message: "Event updated successfully!",
-      data: event // Trả về thông tin của sự kiện đã được cập nhật
-    });
-
-  } catch (err) {
-    // Xử lý lỗi nếu có
-    console.error(err);
-    res.status(500).json({ message: "Lỗi server" });
+router.put(
+  "/updateEvent/:id",isAuth(["Admin"]),
+  async (req, res) => {
+    try {
+      const id = req.params.id;
+      const eventData = req.body; // Assuming the updated event data is sent in the request body
+      const updatedEvent = await EventModel.findByIdAndUpdate(id, eventData, { new: true });
+      res.send(updatedEvent);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error updating event");
+    }
   }
-});
+);
 
   // * POST search event by name.
 router.post("/searchByName",isAuth(["Student", "Admin", "Marketing Manager","Marketing Coordinator"]), async (req, res) => {

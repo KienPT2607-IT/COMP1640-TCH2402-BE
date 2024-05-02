@@ -18,7 +18,6 @@ let transporter = nodemailer.createTransport({
         pass: emailPass
     }
 });
-
 async function sendCommentNotification(contributionCreatorEmail, contributionId) {
   try {
       // Tạo nội dung email
@@ -28,8 +27,7 @@ async function sendCommentNotification(contributionCreatorEmail, contributionId)
           subject: 'New Comment on Your Contribution',
           text: `Someone commented on your contribution with ID: ${contributionId}. Check it out!`
       };
-
-      // Gửi email
+     // Gửi email
       let info = await transporter.sendMail(mailOptions);
       console.log('Email sent: ', info.response);
   } catch (error) {
@@ -40,24 +38,19 @@ async function sendCommentNotification(contributionCreatorEmail, contributionId)
 router.post("/create", isAuth(["Student"]), async (req, res) => {
   try {
     const { content, contribution } = req.body;
-
     // Lấy _id của commenter từ req._id
     const commenter = req._id;
-
     // Kiểm tra xem contribution có tồn tại không
     const contributionExists = await ContributionModel.findById(contribution);
     if (!contributionExists) {
       return res.status(404).json({ message: "Contribution not found" });
     }
-
     const newComment = new CommentModel({
       content,
       commenter,
       contribution,
     });
-
     const savedComment = await newComment.save();
-
     // Lấy email của người tạo đóng góp
     const contributionCreator = await UserModel.findById(contributionExists.contributor);
     const contributionCreatorEmail = contributionCreator.email;
