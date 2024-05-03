@@ -11,26 +11,38 @@ var EventSchema = Schema({
 		default: Date.now,
 	},
 	due_date: {
-		type: Date,
-		required: true,
-	},
-	closure_date: {
-		type: Date,
-		required: true,
-	},
+        type: Date,
+        required: true,
+        validate: {
+            validator: function(value) {
+                return value > this.create_date;
+            },
+            message: 'The event end date must be after the event creation date.'
+        }
+    },
+    closure_date: {
+        type: Date,
+        required: true,
+        validate: {
+            validator: function(value) {
+                return value > this.due_date;
+            },
+            message: 'The event close date must be after the event end date.'
+        }
+    },
 	is_enable: {
 		type: Boolean,
 		require: true,
 		default: true,
 	},
-	last_update: {
-		type: Date,
-		require: true,
-		default: Date.now,
-	},
 	create_by: {
 		type: SchemaTypes.ObjectId,
 		ref: "users",
+		required: true,
+	},
+	faculty: {
+		type: SchemaTypes.ObjectId,
+		ref: "faculties",
 		required: true,
 	},
 	description: String,
