@@ -2,6 +2,7 @@ require("dotenv").config();
 
 var express = require("express");
 const ContributionModel = require("../models/ContributionModel");
+const EventModel = require("../models/EventModel");
 const { isAuth } = require("../middlewares/auth");
 const { getUploadMiddleware, removeFiles } = require("../middlewares/upload");
 const { processContribution } = require("../utilities/process_contribution");
@@ -64,6 +65,11 @@ router.post(
 	async (req, res) => {
 		try {
 			const { content, event } = req.body;
+			const eventSnapshot = await EventModel.findById(event);
+			const currentDate = new Date();
+			if (currentDate > eventSnapshot.due_date) {
+				return res.status(400).json({ message: "Event overdue!" });
+			}
 			await ContributionModel.create({
 				content: content,
 				uploads: req._files,
